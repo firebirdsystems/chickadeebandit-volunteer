@@ -109,6 +109,78 @@ async function notify(title, body) {
 
 Always `.catch(() => {})` — notifications are best-effort.
 
+**The default `audience` is `"all"` — the whole household.** Never send the contents of a
+restricted item (a private/role/board-only channel message, an adults-only note, etc.)
+through the plain `notify` helper: every member's device receives the preview, even members
+who can't open the item. To target specific people, pass an explicit member-id list:
+`{ title, body, audience: ["member-id-1", "member-id-2"] }`. But you usually can't compute
+"who follows this channel" on the client (that data is `owner_only`) — use
+`subscription_notify` below.
+
+### `subscription_notify` — notify a topic's followers without leaking previews
+
+For "follow this channel / thread / event and get notified of new activity", declare
+`subscription_notify`. The hub exposes `POST /run/{appId}/api/notify-subscribers`, which
+reads your per-member opt-in table (kept `owner_only`, so the client can't read other
+members' rows), unions in any explicit `also_notify` ids (e.g. @mentions), drops the
+sender, then **re-checks that each recipient may still see the topic** before pushing only
+to them. The caller must also be eligible for the topic (a non-member can't trigger
+notifications into a channel they're not in).
+
+**Why you can't do this with the plain `notify` helper:** subscriptions are `owner_only`,
+so a member's browser can only read *its own* follow rows — it can't resolve, let alone
+fan out to, the full follower list. And `owner_only` lets any member opt into any topic id,
+so the recipient list must be re-filtered server-side or a non-member who subscribed to a
+private channel would receive its previews.
+
+```jsonc
+// manifest.json — the subscription table must have an owner_only row policy
+{
+  "row_policies": {
+    "channel_subscriptions": { "kind": "owner_only", "member_column": "member_id", "adults_bypass": false }
+  },
+  "subscription_notify": {
+    "subscription_table": "channel_subscriptions",
+    "topic_column": "channel_id",
+    "member_column": "member_id",
+    "eligibility": {
+      "kind": "channel_membership",
+      "channels_table": "channels",
+      "membership_type_column": "membership_type",   // must be plaintext (db_plaintext_columns)
+      "membership_roles_column": "membership_roles",  // must be plaintext
+      "membership_table": "channel_members",
+      "membership_channel_column": "channel_id",
+      "membership_member_column": "member_id"
+    }
+  }
+}
+```
+
+```js
+// Follow / unfollow is just an owner_only write of the caller's own row:
+await db(`INSERT INTO app_x__channel_subscriptions (channel_id, member_id) VALUES (?, ?) ON CONFLICT DO NOTHING`, [channelId, ME.id]);
+await db(`DELETE FROM app_x__channel_subscriptions WHERE channel_id = ? AND member_id = ?`, [channelId, ME.id]);
+
+// After a new message, fan out (fire-and-forget) through the hub:
+await fetch(window.__NOTIFY_SUBSCRIBERS_URL, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    topic_id: channelId,
+    title: `#${channelName}`,
+    body: `${ME.name}: ${text.slice(0, 80)}`,
+    url: `/run/${APP_ID}?channelId=${channelId}`,
+    also_notify: mentionedMemberIds,   // optional — unioned with followers, still eligibility-checked
+  }),
+}).catch(() => {});
+```
+
+`eligibility.kind: "channel_membership"` mirrors the `channel_scoped` row policy
+(`all` / `role` / `custom` membership). `channels_id_column` defaults to `"id"`;
+`all_value`/`role_value` default to `"all"`/`"role"`. The `membership_type`/`membership_roles`
+columns must be plaintext (the same requirement `channel_scoped` imposes). `group-channels`
+is the reference implementation.
+
 ## Activity log
 
 Many apps log user actions to an `activity` table:
