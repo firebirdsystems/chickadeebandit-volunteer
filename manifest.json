@@ -1,47 +1,58 @@
 {
-  "id": "potluck",
-  "name": "Potluck",
+  "id": "volunteer",
+  "name": "Volunteer Sign-Up",
   "version": "1.0.0",
-  "description": "Create gatherings with dish slots and let members claim, swap, and release dishes without overbooking a category.",
+  "description": "SignUpGenius-style slot sheets for potlucks, classroom helpers, carpool coverage, or shift backfills. Members claim, swap, and release capacity-limited slots without overbooking.",
   "entrypoint": "index.html",
   "runtime": "static",
-  "category": "family",
-  "tags": ["food", "events", "potluck", "slot-claims"],
+  "category": "organization",
+  "tags": ["signup", "volunteer", "slots", "events", "slot-claims"],
   "data_access": {
     "reads": ["family.members"],
-    "writes": ["family.members"]
+    "writes": []
   },
   "permissions": {
     "default_audience": "everyone",
     "requires_approval": false
   },
   "storage": "db",
+  "db_plaintext_columns": ["capacity", "note", "event_date"],
   "row_policies": {
-    "events": {
+    "sheets": {
       "kind": "adult_writable"
     },
     "slots": {
       "kind": "adult_writable"
     },
-    "claims": {
-      "kind": "owner_only",
-      "member_column": "member_id",
-      "adults_bypass": true,
-      "unique_per_member": {
-        "member_column": "member_id",
-        "scope_columns": ["event_id", "slot_id"]
-      }
+    "slot_claims": {
+      "kind": "endpoint_only",
+      "read": "everyone"
     }
   },
-  "publishes": ["potluck.event_created", "potluck.slot_claimed", "potluck.slot_released"],
-  "nav": { "label": "Potluck" },
+  "slot_claims": {
+    "slot_table": "slots",
+    "capacity_column": "capacity",
+    "slot_status_column": "status",
+    "slot_open_values": ["open"],
+    "claims_table": "slot_claims",
+    "slot_fk_column": "slot_id",
+    "member_column": "member_id",
+    "created_at_column": "created_at",
+    "one_claim_per_member": true,
+    "allow_release": true,
+    "allowed_columns": ["note"],
+    "max_text_lengths": { "note": 200 }
+  },
+  "publishes": ["volunteer.sheet_created", "volunteer.slot_claimed"],
+  "nav": { "label": "Volunteer" },
+  "widget": { "label": "Volunteer", "size": "small" },
   "resource_limits": {
     "max_db_bytes": 52428800
   },
-  "icon": "🍽️",
+  "icon": "🙋",
   "ai_access": {
     "allowed": true,
     "mode": "read",
-    "db_exports": ["upcoming_potlucks", "claim_summary"]
+    "db_exports": ["open_slots", "signup_summary"]
   }
 }

@@ -1,7 +1,7 @@
 {
-  "name": "chickadeebandit-potluck",
+  "name": "chickadeebandit-volunteer",
   "version": "1.0.0",
-  "description": "Potluck dish sign-up app for Chickadee Bandit",
+  "description": "Volunteer sign-up slot sheets for Chickadee Bandit",
   "type": "module",
   "scripts": {
     "build": "node build.mjs",

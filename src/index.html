@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Potluck</title>
+  <title>Volunteer Sign-Up</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -17,22 +17,16 @@
       --accent-hover: var(--hub-primary-hover, #374151);
       --accent-fg: var(--hub-primary-fg, #ffffff);
       --radius: var(--hub-radius, 8px);
-      --green: #047857;
-      --green-soft: #d1fae5;
-      --amber: #b45309;
-      --amber-soft: #fef3c7;
-      --red: #b91c1c;
-      --red-soft: #fee2e2;
+      --green: #047857; --green-soft: #d1fae5;
+      --amber: #b45309; --amber-soft: #fef3c7;
+      --red: #b91c1c; --red-soft: #fee2e2;
       --blue-soft: #dbeafe;
       --shadow: 0 1px 3px rgba(15, 23, 42, .07);
     }
     body {
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
+      min-height: 100vh; background: var(--bg); color: var(--text);
       font-family: var(--hub-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-      font-size: var(--hub-font-size, 15px);
-      line-height: 1.5;
+      font-size: var(--hub-font-size, 15px); line-height: 1.5;
     }
     .app { max-width: 820px; margin: 0 auto; padding: 16px; }
     .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
@@ -43,18 +37,15 @@
     .stack { display: grid; gap: 12px; }
     .grid { display: grid; gap: 12px; }
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px;
     }
-    .event-card { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
-    .event-card:hover { border-color: var(--border-mid); box-shadow: 0 5px 14px rgba(15, 23, 42, .08); }
-    .event-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-    .event-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-    .event-title { font-weight: 750; font-size: 1rem; }
-    .event-meta { margin-top: 3px; color: var(--muted); font-size: .82rem; }
+    .sheet-card { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+    .sheet-card:hover { border-color: var(--border-mid); box-shadow: 0 5px 14px rgba(15, 23, 42, .08); }
+    .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .title { font-weight: 750; font-size: 1rem; }
+    .meta { margin-top: 3px; color: var(--muted); font-size: .82rem; }
     .progress { height: 8px; overflow: hidden; border-radius: 999px; background: #eef2f7; margin-top: 10px; }
     .progress > span { display: block; height: 100%; background: var(--green); border-radius: 999px; }
     .pill {
@@ -68,10 +59,7 @@
     .tabs { display: flex; gap: 4px; background: var(--border); padding: 3px; border-radius: 10px; margin-bottom: 14px; }
     .tab { flex: 1; border: 0; border-radius: 8px; background: transparent; color: var(--muted); padding: 7px; font-weight: 700; cursor: pointer; }
     .tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
-    .section-head {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 10px; margin: 6px 2px 10px;
-    }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 6px 2px 10px; }
     .section-head h2 { margin-bottom: 0; }
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
@@ -85,30 +73,17 @@
     .btn-ghost:hover { background: #f8fafc; }
     .btn-danger { background: var(--red-soft); color: var(--red); border-color: transparent; }
     .btn-danger:hover { background: #fecaca; }
-    .btn-quiet-danger {
-      min-height: 28px; padding: 3px 6px; background: transparent; color: var(--muted);
-      border: 0; font-size: .76rem; font-weight: 700;
-    }
+    .btn-quiet-danger { min-height: 28px; padding: 3px 6px; background: transparent; color: var(--muted); border: 0; font-size: .76rem; font-weight: 700; }
     .btn-quiet-danger:hover { background: var(--red-soft); color: var(--red); }
     .btn-sm { min-height: 31px; padding: 5px 9px; font-size: .78rem; }
     .back { margin-bottom: 10px; }
-    .slot {
-      display: grid; gap: 10px; padding: 12px 0; border-top: 1px solid var(--border);
-    }
+    .slot { display: grid; gap: 10px; padding: 12px 0; border-top: 1px solid var(--border); }
     .slot:first-child { border-top: 0; padding-top: 0; }
     .slot-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
     .slot-name { font-weight: 750; }
     .claims { display: flex; flex-wrap: wrap; gap: 6px; }
-    .claim-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: #f8fafc; border: 1px solid var(--border);
-      border-radius: 999px; padding: 3px 8px 3px 4px; font-size: .78rem;
-    }
-    .avatar {
-      width: 22px; height: 22px; border-radius: 50%;
-      display: inline-flex; align-items: center; justify-content: center;
-      color: white; font-size: .72rem; font-weight: 800; background: #0f766e;
-    }
+    .claim-chip { display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid var(--border); border-radius: 999px; padding: 3px 8px 3px 4px; font-size: .78rem; }
+    .avatar { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: .72rem; font-weight: 800; background: #0f766e; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .form { display: grid; gap: 10px; }
     .field { display: grid; gap: 4px; }
@@ -120,82 +95,108 @@
     textarea { min-height: 72px; resize: vertical; }
     input:focus, textarea:focus { outline: none; border-color: var(--accent); }
     .slot-builder { display: grid; gap: 8px; }
-    .slot-row { display: grid; grid-template-columns: 1fr 74px auto; gap: 8px; align-items: center; }
+    .slot-row { display: grid; grid-template-columns: 1fr 96px 74px auto; gap: 8px; align-items: center; }
     .empty, .loading { color: var(--muted); text-align: center; padding: 32px 16px; }
     .error { background: var(--red-soft); color: var(--red); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
-    .notice { background: var(--amber-soft); color: var(--amber); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
-    @media (min-width: 700px) {
-      .grid.two { grid-template-columns: 1fr 1fr; }
-    }
+    .notice { background: var(--green-soft); color: var(--green); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
+    @media (min-width: 700px) { .grid.two { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 560px) {
-      .topbar, .event-head, .slot-top { align-items: stretch; flex-direction: column; }
+      .topbar, .head, .slot-top { align-items: stretch; flex-direction: column; }
       .slot-row { grid-template-columns: 1fr; }
       .actions .btn { flex: 1; }
     }
   </style>
-  <base href="/run/potluck/">
+  <base href="/run/volunteer/">
 </head>
 <body>
-<div class="app">
-  <div id="root" class="loading">Loading...</div>
-</div>
+<div class="app"><div id="root" class="loading">Loading…</div></div>
 
 <script type="module">
-import { esc, isAdult, memberColor, initial, hubConfirm } from "/hub-sdk.js";
+import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl } from "/hub-sdk.js";
+import {
+  canManage as _canManage, isSlotFull as _isSlotFull, claimCount as _claimCount,
+  myClaim as _myClaim, sheetTotals as _sheetTotals, claimErrorMessage,
+} from "./logic.js";
 
-const CONTEXT = window.__CONTEXT_URL ?? "";
-const DB = window.__DB_URL ?? "";
-const HUB_MEMBER = window.__CURRENT_MEMBER ?? null;
+const CONTEXT     = window.__CONTEXT_URL   ?? "";
+const DB          = window.__DB_URL        ?? "";
+const CLAIM_URL   = window.__CLAIM_URL     ?? "";
+const RELEASE_URL = window.__RELEASE_URL   ?? "";
+const SWAP_URL    = window.__SWAP_URL      ?? "";
+const EVENTS_URL  = window.__EVENTS_URL    ?? "/api/events";
+const APP_ID      = window.__APP_ID        ?? "volunteer";
+const ME          = window.__CURRENT_MEMBER ?? null;
 
 let members = [];
+let memberMap = new Map();
 let currentMember = null;
-let events = [];
+let sheets = [];
 let slots = [];
 let claims = [];
-let selectedEventId = null;
-let view = "upcoming";
+let selectedSheetId = null;
+let view = "sheets";      // "sheets" | "mine" | "create"
 let error = "";
 let notice = "";
-let draftSlots = [
-  { name: "Turkey", capacity: 1 },
-  { name: "Sides", capacity: 4 },
-  { name: "Desserts", capacity: 2 },
-];
+let draftSlots = [{ title: "", capacity: 1, starts_at: "" }];
 
-function nowIso() { return new Date().toISOString(); }
-function uid(prefix) { return `${prefix}-${crypto.randomUUID()}`; }
-function today() { return new Date().toISOString().slice(0, 10); }
-function fmtDate(value) {
-  if (!value) return "";
-  return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" })
-    .format(new Date(`${value}T12:00:00`));
+// ── thin wrappers binding pure logic to app state ──
+function canManage() { return _canManage(currentMember); }
+function claimCount(slotId) { return _claimCount(slotId, claims); }
+function isSlotFull(slot) { return _isSlotFull(slot, claims); }
+function myClaim(slotId) { return _myClaim(slotId, claims, currentMember?.id); }
+function sheetTotals(sheetId) { return _sheetTotals(sheetId, slots, claims); }
+
+const nowIso = () => new Date().toISOString();
+const uid = (p) => `${p}-${crypto.randomUUID()}`;
+const today = () => new Date().toISOString().slice(0, 10);
+function memberName(id) { return memberMap.get(id)?.name ?? "Member"; }
+function fmtDate(v) {
+  if (!v) return "";
+  return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(new Date(`${v}T12:00:00`));
 }
-function memberById(id) { return members.find(m => m.id === id) ?? null; }
-function canCreate() { return isAdult(currentMember); }
-function selectedEvent() { return events.find(e => e.id === selectedEventId) ?? null; }
-function eventSlots(eventId) { return slots.filter(s => s.event_id === eventId).sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name)); }
-function slotClaims(slotId) { return claims.filter(c => c.slot_id === slotId).sort((a, b) => a.claimed_at.localeCompare(b.claimed_at)); }
-function myClaim(slotId) { return claims.find(c => c.slot_id === slotId && c.member_id === currentMember?.id) ?? null; }
-function claimedCount(slotId) { return slotClaims(slotId).length; }
-function eventTotals(eventId) {
-  const ss = eventSlots(eventId);
-  const capacity = ss.reduce((sum, s) => sum + Number(s.capacity || 0), 0);
-  const claimed = ss.reduce((sum, s) => sum + claimedCount(s.id), 0);
-  return { claimed, capacity, pct: capacity ? Math.min(100, Math.round((claimed / capacity) * 100)) : 0 };
+function fmtTime(v) {
+  if (!v) return "";
+  const d = new Date(v);
+  if (isNaN(d)) return "";
+  return new Intl.DateTimeFormat(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" }).format(d);
 }
+function sheetSlots(sheetId) {
+  return slots.filter(s => s.sheet_id === sheetId).sort((a, b) => (a.sort_order - b.sort_order) || a.title.localeCompare(b.title));
+}
+function slotClaims(slotId) {
+  return claims.filter(c => c.slot_id === slotId).sort((a, b) => a.created_at.localeCompare(b.created_at));
+}
+function selectedSheet() { return sheets.find(s => s.id === selectedSheetId) ?? null; }
 
 async function dbq(sql, params = []) {
   if (!DB) return { rows: [] };
   const res = await fetch(DB, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ sql, params }),
   });
   const json = await res.json();
   if (json.error) throw new Error(json.error);
   return json;
 }
+async function postJson(url, body) {
+  const res = await fetch(url, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || json.error) {
+    throw Object.assign(new Error(json.error || "Request failed"), { reason: json.reason, status: res.status });
+  }
+  return json;
+}
+function publish(type, subject_id, payload) {
+  fetch(EVENTS_URL, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ source_app_id: APP_ID, type, subject_id, payload }),
+  }).catch(() => {});
+}
 
+// ── data ──
 async function loadMembers() {
   if (!CONTEXT) {
     members = [
@@ -205,36 +206,38 @@ async function loadMembers() {
       { id: "demo-4", name: "Riley", role: "child" },
     ];
   } else {
-    const res = await fetch(`${CONTEXT}?keys=family.members`);
-    members = ((await res.json())["family.members"]) ?? [];
+    try {
+      const res = await fetch(`${CONTEXT}?keys=family.members`);
+      members = ((await res.json())["family.members"]) ?? [];
+    } catch { members = []; }
   }
-  currentMember = HUB_MEMBER ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
+  memberMap = new Map(members.map(m => [m.id, m]));
+  currentMember = ME ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
 }
 
-async function seedDemo() {
-  if (DB) return;
-  const eventId = "demo-thanksgiving";
-  events = [{
-    id: eventId, title: "Thanksgiving Dinner", date: today(), location: "Home",
-    notes: "Claim what you are bringing so the table balances out.",
-    created_by_id: "demo-1", created_by_name: "Alex", created_at: nowIso(), archived: 0,
+function seedDemo() {
+  const sheetId = "demo-festival";
+  sheets = [{
+    id: sheetId, title: "Fall Festival Coverage", description: "Sign up for a shift at the booth.",
+    location: "Chapter Hall", event_date: today(), created_by: "demo-1", created_by_name: "Alex",
+    created_at: nowIso(), archived: 0,
   }];
   slots = [
-    { id: "slot-turkey", event_id: eventId, name: "Turkey", capacity: 1, sort_order: 0 },
-    { id: "slot-sides", event_id: eventId, name: "Sides", capacity: 4, sort_order: 1 },
-    { id: "slot-desserts", event_id: eventId, name: "Desserts", capacity: 2, sort_order: 2 },
+    { id: "slot-setup", sheet_id: sheetId, title: "Setup crew", details: "Tables & signage", capacity: 3, starts_at: "", status: "open", sort_order: 0, created_at: nowIso() },
+    { id: "slot-booth", sheet_id: sheetId, title: "Booth (afternoon)", details: "", capacity: 2, starts_at: "", status: "open", sort_order: 1, created_at: nowIso() },
+    { id: "slot-clean", sheet_id: sheetId, title: "Cleanup", details: "", capacity: 4, starts_at: "", status: "open", sort_order: 2, created_at: nowIso() },
   ];
-  claims = [{ id: "claim-1", event_id: eventId, slot_id: "slot-desserts", member_id: "demo-2", member_name: "Jordan", note: "Apple pie", claimed_at: nowIso() }];
+  claims = [{ id: "c-1", slot_id: "slot-booth", member_id: "demo-2", note: "", created_at: nowIso() }];
 }
 
 async function loadData() {
-  if (!DB) { await seedDemo(); return; }
-  const [eventRows, slotRows, claimRows] = await Promise.all([
-    dbq("SELECT * FROM app_potluck__events WHERE archived = 0 ORDER BY date ASC, created_at ASC"),
-    dbq("SELECT * FROM app_potluck__slots ORDER BY sort_order ASC, name ASC"),
-    dbq("SELECT * FROM app_potluck__claims ORDER BY claimed_at ASC"),
+  if (!DB) { seedDemo(); return; }
+  const [sheetRows, slotRows, claimRows] = await Promise.all([
+    dbq("SELECT * FROM app_volunteer__sheets WHERE archived = 0 ORDER BY event_date ASC, created_at ASC"),
+    dbq("SELECT * FROM app_volunteer__slots ORDER BY sort_order ASC, title ASC"),
+    dbq("SELECT * FROM app_volunteer__slot_claims ORDER BY created_at ASC"),
   ]);
-  events = eventRows.rows.map(e => ({ ...e, archived: !!e.archived }));
+  sheets = sheetRows.rows.map(s => ({ ...s, archived: !!s.archived }));
   slots = slotRows.rows;
   claims = claimRows.rows;
 }
@@ -242,338 +245,388 @@ async function loadData() {
 async function refresh() {
   clearMessages();
   try {
-    await loadMembers();
-    await loadData();
-    if (selectedEventId && !events.some(e => e.id === selectedEventId)) selectedEventId = null;
+    await Promise.all([loadMembers(), loadData()]);
+    if (selectedSheetId && !sheets.some(s => s.id === selectedSheetId)) selectedSheetId = null;
+    handleDeepLink();
     render();
-  } catch (e) {
-    error = e.message;
-    render();
-  }
+  } catch (e) { error = e.message; render(); }
+}
+function handleDeepLink() {
+  const sheetId = new URLSearchParams(window.location.search).get("sheetId");
+  if (sheetId && sheets.some(s => s.id === sheetId)) selectedSheetId = sheetId;
 }
 
 function clearMessages() { error = ""; notice = ""; }
-function showError(message) { error = message; notice = ""; render(); }
-function showNotice(message) { notice = message; error = ""; render(); }
+function showError(m) { error = m; notice = ""; render(); }
+function showNotice(m) { notice = m; error = ""; render(); }
 
-async function createEvent(form) {
-  if (!canCreate()) return showError("Only adults and leadership can create potlucks.");
+// ── mutations ──
+async function createSheet(form) {
+  if (!canManage()) return showError("Only adults can create sign-up sheets.");
   const title = form.title.value.trim();
-  const date = form.date.value;
+  const event_date = form.event_date.value;
   const location = form.location.value.trim();
-  const notes = form.notes.value.trim();
+  const description = form.description.value.trim();
   const cleanSlots = draftSlots
-    .map((s, index) => ({ ...s, name: s.name.trim(), capacity: Math.max(1, Number(s.capacity) || 1), sort_order: index }))
-    .filter(s => s.name);
-  if (!title || !date || cleanSlots.length === 0) return showError("Add a title, date, and at least one dish slot.");
+    .map((s, i) => ({ title: s.title.trim(), capacity: Math.max(1, Number(s.capacity) || 1), starts_at: s.starts_at || "", sort_order: i }))
+    .filter(s => s.title);
+  if (!title || cleanSlots.length === 0) return showError("Add a title and at least one slot.");
 
-  const event = {
-    id: uid("potluck"), title, date, location, notes,
-    created_by_id: currentMember.id, created_by_name: currentMember.name, created_at: nowIso(), archived: 0,
+  const btn = form.querySelector('button[type="submit"]');
+  if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
+
+  const sheet = {
+    id: uid("sheet"), title, description, location, event_date,
+    created_by: currentMember.id, created_by_name: currentMember.name, created_at: nowIso(), archived: 0,
   };
-  const eventSlotsToInsert = cleanSlots.map(s => ({ ...s, id: uid("slot"), event_id: event.id, created_at: nowIso() }));
-
+  const newSlots = cleanSlots.map(s => ({ ...s, id: uid("slot"), sheet_id: sheet.id, details: "", status: "open", created_at: nowIso() }));
   try {
     if (DB) {
       await dbq(
-        `INSERT INTO app_potluck__events (id, title, date, location, notes, created_by_id, created_by_name, created_at, archived)
+        `INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`,
-        [event.id, event.title, event.date, event.location, event.notes, event.created_by_id, event.created_by_name, event.created_at]
+        [sheet.id, sheet.title, sheet.description, sheet.location, sheet.event_date, sheet.created_by, sheet.created_by_name, sheet.created_at]
       );
-      for (const s of eventSlotsToInsert) {
+      for (const s of newSlots) {
         await dbq(
-          `INSERT INTO app_potluck__slots (id, event_id, name, capacity, sort_order, created_at)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [s.id, s.event_id, s.name, s.capacity, s.sort_order, s.created_at]
+          `INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, starts_at, status, sort_order, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?)`,
+          [s.id, s.sheet_id, s.title, s.details, s.capacity, s.starts_at, s.sort_order, s.created_at]
         );
       }
     }
-    events = [...events, event].sort((a, b) => a.date.localeCompare(b.date));
-    slots = [...slots, ...eventSlotsToInsert];
-    selectedEventId = event.id;
-    view = "upcoming";
-    showNotice("Potluck created.");
+    sheets = [...sheets, sheet].sort((a, b) => (a.event_date || "").localeCompare(b.event_date || ""));
+    slots = [...slots, ...newSlots];
+    draftSlots = [{ title: "", capacity: 1, starts_at: "" }];
+    selectedSheetId = sheet.id;
+    view = "sheets";
+    showNotice("Sign-up sheet created.");
+    publish("volunteer.sheet_created", sheet.id, { title: sheet.title });
+    sendHubNotification({
+      title: "New volunteer sheet",
+      body: `${sheet.title} — sign up for a slot.`,
+      url: hubAppUrl(APP_ID, { sheetId: sheet.id }),
+    }).catch(() => {});
   } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = "Create sheet"; }
     showError(e.message);
   }
 }
 
-async function claimSlot(slotId) {
+async function claimSlot(slotId, note = "") {
   const slot = slots.find(s => s.id === slotId);
   if (!slot || !currentMember) return false;
-  if (myClaim(slotId)) { showError("You already claimed this slot."); return false; }
-  if (claimedCount(slotId) >= Number(slot.capacity)) { showError("That slot is already full."); return false; }
-  const claim = {
-    id: uid("claim"), event_id: slot.event_id, slot_id: slot.id,
-    member_id: currentMember.id, member_name: currentMember.name, note: "", claimed_at: nowIso(),
-  };
   try {
-    if (DB) {
-      const result = await dbq(
-        `INSERT INTO app_potluck__claims (id, event_id, slot_id, member_id, member_name, note, claimed_at)
-         SELECT ?, ?, ?, ?, ?, ?, ?
-         WHERE (SELECT COUNT(*) FROM app_potluck__claims WHERE slot_id = ?) <
-               (SELECT capacity FROM app_potluck__slots WHERE id = ?)
-           AND NOT EXISTS (
-             SELECT 1 FROM app_potluck__claims WHERE slot_id = ? AND member_id = ?
-           )`,
-        [claim.id, claim.event_id, claim.slot_id, claim.member_id, claim.member_name, claim.note, claim.claimed_at, slot.id, slot.id, slot.id, currentMember.id]
-      );
-      if (result.meta?.changes === 0) throw new Error("Someone just claimed the last opening. Refreshing the list.");
+    let claimId = uid("claim");
+    if (CLAIM_URL) {
+      const res = await postJson(CLAIM_URL, { slot_id: slotId, note });
+      claimId = res.claim_id ?? claimId;
     }
-    claims = [...claims, claim];
-    showNotice(`Claimed ${slot.name}.`);
+    claims = [...claims, { id: claimId, slot_id: slotId, member_id: currentMember.id, note, created_at: nowIso() }];
+    showNotice(`Signed up for ${slot.title}.`);
+    publish("volunteer.slot_claimed", slotId, { sheet_id: slot.sheet_id });
     return true;
   } catch (e) {
-    await loadData().catch(() => {});
-    showError(e.message);
+    if (e.reason) { await loadData().catch(() => {}); showError(claimErrorMessage(e.reason)); }
+    else showError(e.message);
     return false;
   }
 }
 
-async function releaseClaim(claimId) {
-  const claim = claims.find(c => c.id === claimId);
-  if (!claim) return false;
-  const allowed = claim.member_id === currentMember?.id || canCreate();
-  if (!allowed) { showError("You can only release your own claim."); return false; }
+async function releaseClaim(slotId) {
+  const mine = myClaim(slotId);
+  if (!mine) return false;
   try {
-    if (DB) await dbq("DELETE FROM app_potluck__claims WHERE id = ?", [claimId]);
-    claims = claims.filter(c => c.id !== claimId);
-    showNotice("Dish released.");
+    if (RELEASE_URL) await postJson(RELEASE_URL, { slot_id: slotId });
+    claims = claims.filter(c => c.id !== mine.id);
+    showNotice("Released your slot.");
     return true;
-  } catch (e) {
-    showError(e.message);
-    return false;
-  }
+  } catch (e) { showError(e.message); return false; }
 }
 
-async function swapTo(slotId) {
-  const eventId = selectedEventId;
-  const own = claims.find(c => c.event_id === eventId && c.member_id === currentMember?.id);
-  if (!own) return claimSlot(slotId);
-  if (own.slot_id === slotId) return;
-  const ok = await hubConfirm("Move your claim to this dish slot?");
-  if (!ok) return;
-  const oldClaimId = own.id;
-  const claimedNewSlot = await claimSlot(slotId);
-  if (claimedNewSlot) await releaseClaim(oldClaimId);
-}
-
-async function archiveEvent(eventId) {
-  if (!canCreate()) return showError("Only adults and leadership can archive potlucks.");
-  const ok = await hubConfirm({
-    message: "Archive this potluck?",
-    description: "It will be hidden from the active gathering list. Existing claims are preserved.",
-    confirmLabel: "Archive",
-    destructive: true,
-  });
+async function swapSlot(toSlotId) {
+  const sheetId = selectedSheetId;
+  const own = claims.find(c => c.member_id === currentMember?.id && sheetSlots(sheetId).some(s => s.id === c.slot_id));
+  if (!own) return claimSlot(toSlotId);
+  if (own.slot_id === toSlotId) return;
+  const toSlot = slots.find(s => s.id === toSlotId);
+  const ok = await hubConfirm({ message: `Move your sign-up to “${toSlot?.title ?? "this slot"}”?`, confirmLabel: "Move" });
   if (!ok) return;
   try {
-    if (DB) await dbq("UPDATE app_potluck__events SET archived = 1 WHERE id = ?", [eventId]);
-    events = events.filter(e => e.id !== eventId);
-    selectedEventId = null;
-    showNotice("Potluck archived.");
+    if (SWAP_URL) {
+      const res = await postJson(SWAP_URL, { from_slot_id: own.slot_id, to_slot_id: toSlotId });
+      claims = claims.filter(c => c.id !== own.id);
+      claims = [...claims, { id: res.claim_id ?? uid("claim"), slot_id: toSlotId, member_id: currentMember.id, note: "", created_at: nowIso() }];
+      showNotice("Moved your sign-up.");
+    }
   } catch (e) {
-    showError(e.message);
+    if (e.reason) { await loadData().catch(() => {}); showError(claimErrorMessage(e.reason)); }
+    else showError(e.message);
   }
 }
 
-function addDraftSlot() {
-  draftSlots.push({ name: "", capacity: 1 });
-  render();
-}
-function updateDraft(index, field, value) {
-  draftSlots[index][field] = field === "capacity" ? Math.max(1, Number(value) || 1) : value;
-}
-function removeDraft(index) {
-  draftSlots.splice(index, 1);
-  if (!draftSlots.length) addDraftSlot();
-  render();
+async function archiveSheet(sheetId) {
+  if (!canManage()) return showError("Only adults can archive sheets.");
+  const ok = await hubConfirm({ message: "Archive this sheet?", description: "It will be hidden from the active list. Existing sign-ups are preserved.", confirmLabel: "Archive", destructive: true });
+  if (!ok) return;
+  try {
+    if (DB) await dbq("UPDATE app_volunteer__sheets SET archived = 1 WHERE id = ?", [sheetId]);
+    sheets = sheets.filter(s => s.id !== sheetId);
+    selectedSheetId = null;
+    showNotice("Sheet archived.");
+  } catch (e) { showError(e.message); }
 }
 
+async function toggleSlotStatus(slotId) {
+  if (!canManage()) return;
+  const slot = slots.find(s => s.id === slotId);
+  if (!slot) return;
+  const next = slot.status === "open" ? "closed" : "open";
+  try {
+    if (DB) await dbq("UPDATE app_volunteer__slots SET status = ? WHERE id = ?", [next, slotId]);
+    const i = slots.findIndex(s => s.id === slotId);
+    if (i !== -1) slots[i] = { ...slots[i], status: next };
+    render();
+  } catch (e) { showError(e.message); }
+}
+
+// draft slot editing
+function addDraftSlot() { draftSlots.push({ title: "", capacity: 1, starts_at: "" }); render(); }
+function updateDraft(i, field, value) {
+  draftSlots[i][field] = field === "capacity" ? Math.max(1, Number(value) || 1) : value;
+}
+function removeDraft(i) { draftSlots.splice(i, 1); if (!draftSlots.length) draftSlots.push({ title: "", capacity: 1, starts_at: "" }); render(); }
+
+// ── render ──
 function renderMessages() {
   return `${error ? `<div class="error">${esc(error)}</div>` : ""}${notice ? `<div class="notice">${esc(notice)}</div>` : ""}`;
 }
-
-function renderEventCard(event) {
-  const totals = eventTotals(event.id);
-  const statusClass = totals.capacity && totals.claimed >= totals.capacity ? "good" : totals.claimed ? "info" : "warn";
+function renderTabs() {
   return `
-    <article class="card event-card" data-open-event="${esc(event.id)}">
-      <div class="event-head">
-        <div>
-          <div class="event-title">${esc(event.title)}</div>
-          <div class="event-meta">${esc(fmtDate(event.date))}${event.location ? ` · ${esc(event.location)}` : ""}</div>
-        </div>
-        <span class="pill ${statusClass}">${totals.claimed}/${totals.capacity} claimed</span>
-      </div>
-      ${event.notes ? `<p class="event-meta">${esc(event.notes)}</p>` : ""}
-      <div class="progress" aria-hidden="true"><span style="width:${totals.pct}%"></span></div>
-    </article>
-  `;
+    <div class="tabs">
+      <button class="tab ${view === "sheets" ? "active" : ""}" data-tab="sheets">Sheets</button>
+      <button class="tab ${view === "mine" ? "active" : ""}" data-tab="mine">My sign-ups</button>
+    </div>`;
 }
-
+function renderSheetCard(sheet) {
+  const t = sheetTotals(sheet.id);
+  const cls = t.filled ? "good" : t.claimed ? "info" : "warn";
+  return `
+    <article class="card sheet-card" data-open-sheet="${esc(sheet.id)}">
+      <div class="head">
+        <div>
+          <div class="title">${esc(sheet.title)}</div>
+          <div class="meta">${esc(fmtDate(sheet.event_date))}${sheet.location ? ` · ${esc(sheet.location)}` : ""}</div>
+        </div>
+        <span class="pill ${cls}">${t.claimed}/${t.capacity} filled</span>
+      </div>
+      ${sheet.description ? `<p class="meta">${esc(sheet.description)}</p>` : ""}
+      <div class="progress" aria-hidden="true"><span style="width:${t.pct}%"></span></div>
+    </article>`;
+}
 function renderList() {
-  const visible = [...events].sort((a, b) => a.date.localeCompare(b.date));
+  const visible = [...sheets].sort((a, b) => (a.event_date || "").localeCompare(b.event_date || ""));
   return `
     <div class="topbar">
-      <div>
-        <h1>Potluck</h1>
-        <p class="muted tiny">Claim dishes without double-booking dessert.</p>
-      </div>
-      ${canCreate() ? `<button class="btn" data-view-create>Create</button>` : ""}
+      <div><h1>Volunteer Sign-Up</h1><p class="muted tiny">Claim a slot without overbooking.</p></div>
+      ${canManage() ? `<button class="btn" data-view-create>New sheet</button>` : ""}
     </div>
     ${renderMessages()}
-    <div class="section-head">
-      <h2>Gatherings</h2>
-      <button class="btn btn-ghost btn-sm" type="button" data-refresh>Refresh</button>
-    </div>
+    ${renderTabs()}
+    <div class="section-head"><h2>Active sheets</h2><button class="btn btn-ghost btn-sm" data-refresh>Refresh</button></div>
     <section class="stack">
-      ${visible.length ? visible.map(renderEventCard).join("") : `<div class="card empty">No potlucks yet.</div>`}
-    </section>
-  `;
+      ${visible.length ? visible.map(renderSheetCard).join("") : `<div class="card empty">No sign-up sheets yet.</div>`}
+    </section>`;
 }
-
-function renderDetail() {
-  const event = selectedEvent();
-  if (!event) return renderList();
-  const totals = eventTotals(event.id);
-  const ownClaims = claims.filter(c => c.event_id === event.id && c.member_id === currentMember?.id);
+function renderMine() {
+  const mine = claims.filter(c => c.member_id === currentMember?.id);
+  const rows = mine.map(c => {
+    const slot = slots.find(s => s.id === c.slot_id);
+    if (!slot) return "";
+    const sheet = sheets.find(s => s.id === slot.sheet_id);
+    return `
+      <article class="card">
+        <div class="head">
+          <div>
+            <div class="title">${esc(slot.title)}</div>
+            <div class="meta">${sheet ? esc(sheet.title) : ""}${slot.starts_at ? ` · ${esc(fmtTime(slot.starts_at))}` : ""}</div>
+          </div>
+          <button class="btn btn-danger btn-sm" data-release="${esc(slot.id)}">Release</button>
+        </div>
+      </article>`;
+  }).filter(Boolean);
   return `
-    <button class="btn btn-ghost btn-sm back" data-back>Back</button>
+    <div class="topbar"><div><h1>My sign-ups</h1></div></div>
     ${renderMessages()}
-    <section class="card stack">
-      <div class="event-head">
-        <div>
-          <h1>${esc(event.title)}</h1>
-          <p class="muted">${esc(fmtDate(event.date))}${event.location ? ` · ${esc(event.location)}` : ""}</p>
-        </div>
-        <div class="event-tools">
-          <span class="pill ${totals.claimed >= totals.capacity ? "good" : "info"}">${totals.claimed}/${totals.capacity} spots</span>
-          ${canCreate() ? `<button class="btn btn-quiet-danger" data-archive="${esc(event.id)}">Archive</button>` : ""}
-        </div>
-      </div>
-      ${event.notes ? `<p>${esc(event.notes)}</p>` : ""}
-      ${ownClaims.length ? `<p class="muted tiny">You are bringing ${ownClaims.map(c => esc(slots.find(s => s.id === c.slot_id)?.name ?? "a dish")).join(", ")}.</p>` : ""}
-    </section>
-    <section class="card">
-      <h2>Dish slots</h2>
-      ${eventSlots(event.id).map(renderSlot).join("") || `<div class="empty">No dish slots yet.</div>`}
-    </section>
-  `;
+    ${renderTabs()}
+    <section class="stack">${rows.length ? rows.join("") : `<div class="card empty">You haven't signed up for anything yet.</div>`}</section>`;
 }
-
+function renderClaim(claim) {
+  return `
+    <span class="claim-chip" ${claim.note ? `title="${esc(claim.note)}"` : ""}>
+      <span class="avatar" style="background:${esc(memberColor(claim.member_id, members))}">${esc(initial(memberName(claim.member_id)))}</span>
+      ${esc(memberName(claim.member_id))}${claim.note ? ` <span class="muted tiny">· ${esc(claim.note)}</span>` : ""}
+    </span>`;
+}
 function renderSlot(slot) {
   const sc = slotClaims(slot.id);
   const mine = myClaim(slot.id);
-  const full = sc.length >= Number(slot.capacity);
-  const hasAnyMine = claims.some(c => c.event_id === slot.event_id && c.member_id === currentMember?.id);
-  const claimButton = mine
-    ? `<button class="btn btn-danger btn-sm" data-release="${esc(mine.id)}">Release</button>`
-    : `<button class="btn btn-sm" data-claim="${esc(slot.id)}" ${full ? "disabled" : ""}>${hasAnyMine ? "Swap here" : "Claim"}</button>`;
+  const full = isSlotFull(slot);
+  const closed = slot.status !== "open";
+  const iHaveSheetClaim = sheetSlots(slot.sheet_id).some(s => myClaim(s.id));
+  let action = "";
+  if (mine) {
+    action = `<button class="btn btn-danger btn-sm" data-release="${esc(slot.id)}">Release</button>`;
+  } else if (closed) {
+    action = `<span class="pill">Closed</span>`;
+  } else if (full) {
+    action = `<button class="btn btn-sm" disabled>Full</button>`;
+  } else if (iHaveSheetClaim) {
+    action = `<button class="btn btn-sm" data-swap="${esc(slot.id)}">Move here</button>`;
+  } else {
+    action = `<button class="btn btn-sm" data-claim="${esc(slot.id)}">Sign up</button>`;
+  }
   return `
     <div class="slot">
       <div class="slot-top">
         <div>
-          <div class="slot-name">${esc(slot.name)}</div>
+          <div class="slot-name">${esc(slot.title)}</div>
+          ${slot.details ? `<div class="meta">${esc(slot.details)}</div>` : ""}
+          ${slot.starts_at ? `<div class="meta tiny">${esc(fmtTime(slot.starts_at))}</div>` : ""}
         </div>
         <span class="pill ${full ? "good" : "warn"}">${sc.length}/${slot.capacity}</span>
       </div>
-      <div class="claims">
-        ${sc.length ? sc.map(renderClaim).join("") : `<span class="muted tiny">Open spot</span>`}
+      <div class="claims">${sc.length ? sc.map(renderClaim).join("") : `<span class="muted tiny">Open</span>`}</div>
+      <div class="actions">
+        ${action}
+        ${canManage() ? `<button class="btn btn-ghost btn-sm" data-toggle="${esc(slot.id)}">${closed ? "Reopen" : "Close"}</button>` : ""}
       </div>
-      <div class="actions">${mine ? claimButton : claimButton.replace("data-claim", hasAnyMine ? "data-swap" : "data-claim")}</div>
-    </div>
-  `;
+    </div>`;
 }
-
-function renderClaim(claim) {
-  const member = memberById(claim.member_id);
-  const color = memberColor(member?.id ?? claim.member_id);
+function renderDetail() {
+  const sheet = selectedSheet();
+  if (!sheet) return renderList();
+  const t = sheetTotals(sheet.id);
   return `
-    <span class="claim-chip">
-      <span class="avatar" style="background:${esc(color)}">${esc(initial(claim.member_name))}</span>
-      ${esc(claim.member_name)}
-    </span>
-  `;
+    <button class="btn btn-ghost btn-sm back" data-back>Back</button>
+    ${renderMessages()}
+    <section class="card stack">
+      <div class="head">
+        <div>
+          <h1>${esc(sheet.title)}</h1>
+          <p class="muted">${esc(fmtDate(sheet.event_date))}${sheet.location ? ` · ${esc(sheet.location)}` : ""}</p>
+        </div>
+        <div class="tools">
+          <span class="pill ${t.filled ? "good" : "info"}">${t.claimed}/${t.capacity} filled</span>
+          ${canManage() ? `<button class="btn btn-quiet-danger" data-archive="${esc(sheet.id)}">Archive</button>` : ""}
+        </div>
+      </div>
+      ${sheet.description ? `<p>${esc(sheet.description)}</p>` : ""}
+    </section>
+    <section class="card">
+      <h2>Slots</h2>
+      ${sheetSlots(sheet.id).map(renderSlot).join("") || `<div class="empty">No slots on this sheet.</div>`}
+    </section>`;
 }
-
 function renderCreate() {
   return `
-    <button class="btn btn-ghost btn-sm back" data-view-list>Back</button>
-    <div class="topbar"><h1>Create Potluck</h1></div>
+    <button class="btn btn-ghost btn-sm back" data-view-sheets>Back</button>
+    <div class="topbar"><h1>New sign-up sheet</h1></div>
     ${renderMessages()}
     <form class="card form" id="create-form">
       <div class="grid two">
-        <div class="field">
-          <label for="title">Gathering</label>
-          <input id="title" name="title" value="Holiday Dinner" required />
-        </div>
-        <div class="field">
-          <label for="date">Date</label>
-          <input id="date" name="date" type="date" value="${today()}" required />
-        </div>
+        <div class="field"><label for="f-title">Title</label><input id="f-title" name="title" placeholder="Fall Festival Coverage" required /></div>
+        <div class="field"><label for="f-date">Date</label><input id="f-date" name="event_date" type="date" value="${today()}" /></div>
       </div>
+      <div class="field"><label for="f-loc">Location</label><input id="f-loc" name="location" placeholder="Chapter hall, school, home" /></div>
+      <div class="field"><label for="f-desc">Description</label><textarea id="f-desc" name="description" placeholder="What are you organizing?"></textarea></div>
       <div class="field">
-        <label for="location">Location</label>
-        <input id="location" name="location" placeholder="Home, clubhouse, chapter hall" />
-      </div>
-      <div class="field">
-        <label for="notes">Notes</label>
-        <textarea id="notes" name="notes" placeholder="Theme, headcount, arrival window"></textarea>
-      </div>
-      <div class="field">
-        <label>Dish slots</label>
+        <label>Slots</label>
         <div class="slot-builder">
           ${draftSlots.map((s, i) => `
             <div class="slot-row">
-              <input data-draft="${i}" data-field="name" value="${esc(s.name)}" placeholder="Dish category" />
+              <input data-draft="${i}" data-field="title" value="${esc(s.title)}" placeholder="Task (e.g. Setup crew)" />
+              <input data-draft="${i}" data-field="starts_at" type="datetime-local" value="${esc(s.starts_at)}" aria-label="Start time" />
               <input data-draft="${i}" data-field="capacity" type="number" min="1" value="${esc(String(s.capacity))}" aria-label="Capacity" />
               <button class="btn btn-ghost btn-sm" type="button" data-remove-draft="${i}">Remove</button>
-            </div>
-          `).join("")}
+            </div>`).join("")}
         </div>
       </div>
       <div class="actions">
         <button class="btn btn-ghost" type="button" data-add-slot>Add slot</button>
-        <button class="btn" type="submit">Create potluck</button>
+        <button class="btn" type="submit">Create sheet</button>
       </div>
-    </form>
-  `;
+    </form>`;
+}
+// ── claim modal (optional "what are you bringing / note") ──
+let modalEl = null;
+function closeModal() { modalEl?.remove(); modalEl = null; }
+function openClaimModal(slotId) {
+  const slot = slots.find(s => s.id === slotId);
+  if (!slot) return;
+  closeModal();
+  modalEl = document.createElement("div");
+  modalEl.style.cssText = "position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;";
+  modalEl.innerHTML = `<div class="card" style="max-width:400px;width:100%;">
+    <h2 style="margin-bottom:2px;">Sign up — ${esc(slot.title)}</h2>
+    <p class="muted tiny" style="margin-bottom:10px;">Add an optional note (e.g. what you're bringing).</p>
+    <div class="field"><label for="m-note">Note</label><input id="m-note" maxlength="200" placeholder="Optional" /></div>
+    <div class="actions" style="margin-top:12px;justify-content:flex-end;">
+      <button class="btn btn-ghost btn-sm" data-modal-cancel>Cancel</button>
+      <button class="btn btn-sm" data-modal-claim="${esc(slotId)}">Sign up</button>
+    </div>
+  </div>`;
+  modalEl.addEventListener("click", e => { if (e.target === modalEl) closeModal(); });
+  document.body.appendChild(modalEl);
+  modalEl.querySelector("#m-note")?.focus();
+}
+async function submitClaim(slotId) {
+  const note = (modalEl?.querySelector("#m-note")?.value ?? "").trim();
+  const btn = modalEl?.querySelector("[data-modal-claim]");
+  if (btn) { btn.disabled = true; btn.textContent = "Signing up…"; }
+  const ok = await claimSlot(slotId, note);
+  if (ok) closeModal();
+  else if (btn) { btn.disabled = false; btn.textContent = "Sign up"; }
 }
 
 function render() {
   const root = document.getElementById("root");
   root.className = "app";
-  root.innerHTML = selectedEventId ? renderDetail() : view === "create" ? renderCreate() : renderList();
+  if (selectedSheetId) root.innerHTML = renderDetail();
+  else if (view === "create") root.innerHTML = renderCreate();
+  else if (view === "mine") root.innerHTML = renderMine();
+  else root.innerHTML = renderList();
 }
 
+// ── events ──
 document.addEventListener("click", (event) => {
-  const target = event.target.closest("button, [data-open-event]");
-  if (!target) return;
-  const openId = target.getAttribute("data-open-event");
-  if (openId) { selectedEventId = openId; clearMessages(); render(); return; }
-  if (target.matches("[data-back], [data-view-list]")) { selectedEventId = null; view = "upcoming"; clearMessages(); render(); return; }
-  if (target.matches("[data-view-create]")) { view = "create"; clearMessages(); render(); return; }
-  if (target.matches("[data-refresh]")) { refresh(); return; }
-  if (target.matches("[data-add-slot]")) { addDraftSlot(); return; }
-  if (target.hasAttribute("data-remove-draft")) { removeDraft(Number(target.getAttribute("data-remove-draft"))); return; }
-  if (target.hasAttribute("data-claim")) { claimSlot(target.getAttribute("data-claim")); return; }
-  if (target.hasAttribute("data-swap")) { swapTo(target.getAttribute("data-swap")); return; }
-  if (target.hasAttribute("data-release")) { releaseClaim(target.getAttribute("data-release")); return; }
-  if (target.hasAttribute("data-archive")) { archiveEvent(target.getAttribute("data-archive")); return; }
+  const t = event.target.closest("button, [data-open-sheet]");
+  if (!t) return;
+  const open = t.getAttribute("data-open-sheet");
+  if (open) { selectedSheetId = open; clearMessages(); render(); return; }
+  if (t.matches("[data-back], [data-view-sheets]")) { selectedSheetId = null; view = "sheets"; clearMessages(); render(); return; }
+  if (t.matches("[data-view-create]")) { view = "create"; selectedSheetId = null; clearMessages(); render(); return; }
+  if (t.hasAttribute("data-tab")) { view = t.getAttribute("data-tab"); selectedSheetId = null; clearMessages(); render(); return; }
+  if (t.matches("[data-refresh]")) { refresh(); return; }
+  if (t.matches("[data-add-slot]")) { addDraftSlot(); return; }
+  if (t.hasAttribute("data-remove-draft")) { removeDraft(Number(t.getAttribute("data-remove-draft"))); return; }
+  if (t.matches("[data-modal-cancel]")) { closeModal(); return; }
+  if (t.hasAttribute("data-modal-claim")) { submitClaim(t.getAttribute("data-modal-claim")); return; }
+  if (t.hasAttribute("data-claim")) { openClaimModal(t.getAttribute("data-claim")); return; }
+  if (t.hasAttribute("data-swap")) { swapSlot(t.getAttribute("data-swap")); return; }
+  if (t.hasAttribute("data-release")) { releaseClaim(t.getAttribute("data-release")); return; }
+  if (t.hasAttribute("data-toggle")) { toggleSlotStatus(t.getAttribute("data-toggle")); return; }
+  if (t.hasAttribute("data-archive")) { archiveSheet(t.getAttribute("data-archive")); return; }
 });
-
 document.addEventListener("input", (event) => {
   const input = event.target.closest("[data-draft]");
   if (!input) return;
   updateDraft(Number(input.getAttribute("data-draft")), input.getAttribute("data-field"), input.value);
 });
-
 document.addEventListener("submit", (event) => {
   if (event.target.id !== "create-form") return;
   event.preventDefault();
-  createEvent(event.target);
+  createSheet(event.target);
 });
 
 refresh();
