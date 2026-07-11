@@ -861,7 +861,7 @@ same restrictions.
   silently under-enforced — keep queries against governed tables to simple
   single-table `SELECT`/`INSERT`/`UPDATE`/`DELETE`.
 - On a policy violation, `/api/db` returns `403` with `{ "error": "..." }`.
-- `unique_per_member` is an INSERT-only modifier available on any policy kind.
+- `max_per_member` is an INSERT-only modifier available on any policy kind.
   It enforces one row per member per declared scope inside `executeAppSql`.
 - `frozen_when` is a write-freeze modifier available on any policy kind:
   `{ "status_column": "status", "locked_values": ["adopted", "closed"] }`.
@@ -945,9 +945,9 @@ Read-all, **write-none via `/api/db`**. The only writer is `POST /run/{app}/api/
 
 Example: piggy-bank `piggy_banks`/`transactions` — a child only sees their own bank/transactions; adults (parents) see everyone's. Vote receipts for attributed polls — each member can see their own receipt (confirming they voted), but all receipt creation goes through the `submit-response` hub endpoint.
 
-#### `unique_per_member` — one row per member per scope
+#### `max_per_member` — one row per member per scope
 
-Use `unique_per_member` when the row is **not secret** but each member should only
+Use `max_per_member` when the row is **not secret** but each member should only
 be able to create one row within a logical scope: one RSVP per event, one rating
 per watchlist title, one guess per trivia round, one claim per slot.
 
@@ -956,7 +956,7 @@ per watchlist title, one guess per trivia round, one claim per slot.
   "kind": "owner_only",
   "member_column": "member_id",
   "adults_bypass": false,
-  "unique_per_member": {
+  "max_per_member": {
     "member_column": "member_id",
     "scope_columns": ["event_id"]
   }
@@ -1053,7 +1053,7 @@ top of the base policy's row filter.
   comparison or ordering oracle. **Assigning** the column (`INSERT`,
   `UPDATE ... SET secret_word = ?`) is allowed, so the owner can still write it.
 - You cannot mask a policy-structural column (the owner column, `visibility_column`,
-  a `unique_per_member` scope column, `frozen_when.status_column`, etc.) — manifest
+  a `max_per_member` scope column, `frozen_when.status_column`, etc.) — manifest
   validation rejects it, because the hub itself compares those columns.
 - This masks **reads**; it does not make the column immutable. For write control of
   a column, keep it out of the writable table or write it through an endpoint.
@@ -1204,7 +1204,7 @@ table, make moves/questions/guesses an `inherit_visibility` child table, and set
 `insert_only_by_parent_column_member: "current_turn_member_id"` on that child
 policy. This covers async turn rotation for Word Game / 20 Questions / Draw &
 Guess-style apps without a bespoke server endpoint per game. Pair it with
-`unique_per_member` when the child table also needs one attributed row per round
+`max_per_member` when the child table also needs one attributed row per round
 or turn.
 
 #### `sealed_until` — owners see their response until the parent closes, then everyone sees
@@ -1223,7 +1223,7 @@ can read all responses.
   "writer_column": "member_id",
   "parent_status_column": "status",
   "visible_parent_status_values": ["closed"],
-  "unique_per_member": {
+  "max_per_member": {
     "member_column": "member_id",
     "scope_columns": ["round_id"]
   },
@@ -1242,7 +1242,7 @@ can read all responses.
   or delete responses after the parent round closes.
 - `parent_status_column` must be plaintext. `status` is built in; custom release
   columns such as `round_state` must be listed in `db_plaintext_columns`.
-- Pair with `unique_per_member` for "one answer/guess/bid per member per round."
+- Pair with `max_per_member` for "one answer/guess/bid per member per round."
   This is still attributed data, so do not use it for anonymous surveys or secret
   ballots; use `anonymous_responses` / `anonymous_ballot` when the response row
   must not identify the member.
@@ -1263,7 +1263,7 @@ rows and `sealed_until` for the final per-member responses.
 | Same, but non-adults should only read their own rows | `adult_writable` with `member_read_column` |
 | Settings row that names a privileged group (board_group_id, committee_group_id) | `app_config` |
 | One row per member, only that member (and maybe adults) should see it | `owner_only` |
-| One attributed submission per member per event/round/title/slot | Any suitable row policy plus `unique_per_member` |
+| One attributed submission per member per event/round/title/slot | Any suitable row policy plus `max_per_member` |
 | Same, but writes must go through a hub endpoint (e.g. vote receipts) | `owner_only` with `endpoint_writes_only: true` |
 | Like the above, but the row references another owned row (e.g. a transaction against a bank) | `owner_only_with_fk_check` |
 | A row can be private, shared with adults, or shared with everyone | `owner_or_visibility` |
@@ -1273,7 +1273,7 @@ rows and `sealed_until` for the final per-member responses.
 | Shared between exactly two partnered members | `couple_scoped` |
 | Votes/comments/logs/check-offs whose visibility should match a parent record | `inherit_visibility` |
 | Turn-based child rows where only the current player may INSERT (moves, questions, guesses) | `inherit_visibility` with `insert_only_by_parent_column_member: "current_turn_member_id"` |
-| Attributed responses hidden from everyone except the owner until the parent closes | `sealed_until` with `visible_parent_status_values: ["closed"]`; usually add `unique_per_member` and `frozen_when` |
+| Attributed responses hidden from everyone except the owner until the parent closes | `sealed_until` with `visible_parent_status_values: ["closed"]`; usually add `max_per_member` and `frozen_when` |
 | Anonymous data with no per-row ownership at all (e.g. cast ballots, raw anonymous responses) | `endpoint_only` with `read:"none"` — pair with a receipt table under `owner_only` + `adults_bypass:false` + `member_can_update:false` + `endpoint_writes_only:true`; use `anonymous_responses` or `anonymous_ballot` manifest mechanisms to write both atomically |
 | Everyone can read, but only a specific group may INSERT (e.g. board-managed docs) | `owner_or_visibility` with `everyone_values`, `write_owner_only: true`, and `insert_privileged_only: true` |
 | Child rows where only a privileged group may create them (e.g. document versions) | `inherit_visibility` with `insert_privileged_only: true` |
@@ -1370,7 +1370,7 @@ for how you write those `.sql` files:
 
 For sign-up sheets, shift claims, carpool seats, babysitting co-op coverage, amenity slots, and any "claim iff capacity remains" flow, use the `slot_claims` manifest mechanism instead of writing the claims table directly through `/api/db`.
 
-**Why you can't do this with row_policies alone:** capacity is a cross-row invariant. A browser can read "2 seats left" and then race another browser before inserting; `unique_per_member` can prevent duplicate claims by the same member, but it cannot atomically enforce `COUNT(claims) < slots.capacity`.
+**Why you can't do this with row_policies alone:** capacity is a cross-row invariant. A browser can read "2 seats left" and then race another browser before inserting; `max_per_member` can prevent duplicate claims by the same member, but it cannot atomically enforce `COUNT(claims) < slots.capacity`.
 
 ### How it works
 
