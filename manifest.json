@@ -7,6 +7,7 @@
   "runtime": "static",
   "category": "organization",
   "tags": ["signup", "volunteer", "slots", "events", "slot-claims"],
+  "contexts": ["household", "shared_space"],
   "data_access": {
     "reads": ["family.members"],
     "writes": []
@@ -19,10 +20,12 @@
   "db_plaintext_columns": ["capacity", "note", "event_date"],
   "row_policies": {
     "sheets": {
-      "kind": "adult_writable"
+      "kind": "adult_writable",
+      "steward_writes_only": true
     },
     "slots": {
-      "kind": "adult_writable"
+      "kind": "adult_writable",
+      "steward_writes_only": true
     },
     "slot_claims": {
       "kind": "endpoint_only",
