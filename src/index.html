@@ -105,6 +105,13 @@
       .slot-row { grid-template-columns: 1fr; }
       .actions .btn { flex: 1; }
     }
+    .search-row { margin-bottom: 12px; }
+    .search-input {
+      width: 100%; border: 1.5px solid var(--border-mid, var(--border, #d1d5db));
+      border-radius: 8px; padding: 9px 11px; font: inherit;
+      background: var(--surface, var(--card, #fff)); color: var(--text, inherit);
+    }
+    .search-input:focus { outline: none; border-color: var(--accent, #6366f1); }
   </style>
   <base href="/run/volunteer/">
 </head>
@@ -112,10 +119,10 @@
 <div class="app"><div id="root" class="loading">Loading…</div></div>
 
 <script type="module">
-import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl } from "/hub-sdk.js";
+import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch } from "/hub-sdk.js";
 import {
   canManage as _canManage, isSlotFull as _isSlotFull, claimCount as _claimCount,
-  myClaim as _myClaim, sheetTotals as _sheetTotals, claimErrorMessage,
+  myClaim as _myClaim, sheetTotals as _sheetTotals, claimErrorMessage, searchableFields,
 } from "./logic.js";
 
 const CONTEXT     = window.__CONTEXT_URL   ?? "";
@@ -135,6 +142,7 @@ let slots = [];
 let claims = [];
 let selectedSheetId = null;
 let view = "sheets";      // "sheets" | "mine" | "create"
+let searchQ = "";       // in-app search (see logic.js searchableFields)
 let error = "";
 let notice = "";
 let draftSlots = [{ title: "", capacity: 1, starts_at: "" }];
@@ -434,10 +442,28 @@ function renderList() {
     ${renderMessages()}
     ${renderTabs()}
     <div class="section-head"><h2>Active sheets</h2><button class="btn btn-ghost btn-sm" data-refresh>Refresh</button></div>
-    <section class="stack">
-      ${visible.length ? visible.map(renderSheetCard).join("") : `<div class="card empty">No sign-up sheets yet.</div>`}
+    ${sheets.length ? `<div class="search-row"><input id="search" class="search-input" type="search" placeholder="Search sheets…" aria-label="Search sheets" value="${esc(searchQ)}" /></div>` : ""}
+    <section class="stack" id="sheet-list">
+      ${renderSheetList()}
     </section>`;
 }
+
+// Owns the filtering and the empty states, so the keystroke handler can refresh
+// the list without repeating how it is derived.
+function renderSheetList() {
+  const visible = [...sheets].sort((a, b) => (a.event_date || "").localeCompare(b.event_date || ""));
+  const shown = searchQ ? visible.filter(s => searchMatch(searchQ, searchableFields(s))) : visible;
+  if (shown.length) return shown.map(renderSheetCard).join("");
+  if (searchQ) return `<div class="card empty">No sheets match "${esc(searchQ)}".</div>`;
+  return `<div class="card empty">No sign-up sheets yet.</div>`;
+}
+
+document.addEventListener("input", (e) => {
+  if (e.target.id !== "search") return;
+  searchQ = e.target.value;
+  const el = document.getElementById("sheet-list");
+  if (el) el.innerHTML = renderSheetList();
+});
 function renderMine() {
   const mine = claims.filter(c => c.member_id === currentMember?.id);
   const rows = mine.map(c => {

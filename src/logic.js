@@ -41,3 +41,12 @@ export function claimErrorMessage(reason) {
     default: return "Could not sign up. Please try again.";
   }
 }
+
+/**
+ * Fields the in-app search matches against (see hub-sdk `searchMatch`).
+ * Location and description count as well as the title — a sign-up
+ * sheet is found by where the event is.
+ */
+export function searchableFields(item) {
+  return [item.title, item.description, item.location];
+}

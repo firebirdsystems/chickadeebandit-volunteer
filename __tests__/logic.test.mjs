@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  canManage, claimCount, isSlotFull, myClaim, sheetTotals, claimErrorMessage,
+  canManage, claimCount, isSlotFull, myClaim, sheetTotals, claimErrorMessage, searchableFields,
 } from "../src/logic.js";
 
 const adult = { id: "a1", role: "adult" };
@@ -53,5 +53,13 @@ describe("claimErrorMessage", () => {
     expect(claimErrorMessage("already_claimed")).toMatch(/already/i);
     expect(claimErrorMessage("slot_closed")).toMatch(/closed/i);
     expect(claimErrorMessage("wat")).toMatch(/try again/i);
+  });
+});
+
+describe("searchableFields", () => {
+  it("matches on location and description, not just the sheet title", () => {
+    const fields = searchableFields({ title: "Summer fete", description: "gazebo and raffle", location: "Village green" });
+    expect(fields).toContain("Village green");
+    expect(fields).toContain("gazebo and raffle");
   });
 });
