@@ -52,6 +52,21 @@
     "slot_claims": { "column": "member_id", "on_removed": "delete" }
   },
   "nav": { "label": "Volunteer" },
+  "agenda": {
+    "kind": "event",
+    "label": "Volunteer",
+    "source": {
+      "kind": "sql",
+      "query": "SELECT id AS id, title AS title, NULLIF(location, '') AS subtitle, event_date AS when_at FROM app_volunteer__sheets WHERE event_date = :today AND archived = 0 ORDER BY created_at LIMIT 10"
+    }
+  },
+  "glance": {
+    "source": {
+      "kind": "sql",
+      "query": "SELECT title AS title, NULLIF(location, '') AS subtitle, event_date AS at FROM app_volunteer__sheets WHERE archived = 0 AND event_date >= :today ORDER BY event_date LIMIT 3"
+    },
+    "display": { "template": "list", "title": "title", "subtitle": "subtitle", "when": "at" }
+  },
   "widget": { "label": "Volunteer", "size": "small" },
   "resource_limits": {
     "max_db_bytes": 52428800
