@@ -47,6 +47,10 @@
     "max_text_lengths": { "note": 200 }
   },
   "publishes": ["volunteer.sheet_created", "volunteer.slot_claimed"],
+  "member_references": {
+    "sheets": { "column": "created_by", "on_removed": "keep" },
+    "slot_claims": { "column": "member_id", "on_removed": "delete" }
+  },
   "nav": { "label": "Volunteer" },
   "widget": { "label": "Volunteer", "size": "small" },
   "resource_limits": {
