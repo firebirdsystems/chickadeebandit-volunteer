@@ -46,6 +46,69 @@
     "allowed_columns": ["note"],
     "max_text_lengths": { "note": 200 }
   },
+  "automation_actions": {
+    "create_sheet": {
+      "title": "Open a sign-up sheet",
+      "description": "Open a sheet with its first slot when another app records something that needs helpers — a potluck, a game day, a work party. Members claim the slot the normal way; capacity is still enforced by the hub's claim endpoint.",
+      "params": {
+        "title": { "type": "text", "label": "Sheet title", "required": true },
+        "event_date": { "type": "text", "label": "Date (yyyy-mm-dd)", "required": true },
+        "location": { "type": "text", "label": "Location", "default": "" },
+        "slot_title": { "type": "text", "label": "First slot", "default": "Volunteers" },
+        "capacity": { "type": "integer", "label": "How many people", "default": 1, "min": 1 }
+      },
+      "dedupe": { "table": "sheets", "column": "source_event_id" },
+      "steps": [
+        {
+          "op": "insert",
+          "table": "sheets",
+          "values": {
+            "id": "$uuid",
+            "title": ":title",
+            "location": ":location",
+            "event_date": ":event_date",
+            "created_by": "automation",
+            "created_by_name": "Automation",
+            "created_at": "$now",
+            "source_event_id": "$event_id"
+          }
+        },
+        {
+          "op": "lookup",
+          "table": "sheets",
+          "where": { "source_event_id": "$event_id" },
+          "bind": { "sheet_id": "id" },
+          "on_missing": "error"
+        },
+        {
+          "op": "insert",
+          "table": "slots",
+          "values": {
+            "id": "$uuid",
+            "sheet_id": ":sheet_id",
+            "title": ":slot_title",
+            "capacity": ":capacity",
+            "created_at": "$now"
+          }
+        }
+      ]
+    }
+  },
+  "suggested_automations": [
+    {
+      "title": "Open a sign-up sheet when an event goes on the calendar",
+      "description": "A new calendar event opens a sheet dated the same day, so the ask for helpers exists from the moment the event does rather than a week later when someone remembers.",
+      "trigger_event": "calendar.event_created",
+      "target_app_id": "volunteer",
+      "action_id": "create_sheet",
+      "param_map": {
+        "title": { "kind": "payload_field", "value": "title" },
+        "event_date": { "kind": "payload_field", "value": "start_date" },
+        "slot_title": { "kind": "const", "value": "Help set up" },
+        "capacity": { "kind": "const", "value": 2 }
+      }
+    }
+  ],
   "publishes": ["volunteer.sheet_created", "volunteer.slot_claimed"],
   "member_references": {
     "sheets": { "column": "created_by", "on_removed": "keep" },
