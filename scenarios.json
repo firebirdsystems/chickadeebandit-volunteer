@@ -1,0 +1,328 @@
+{
+  "scenarios": [
+    {
+      "name": "share-link sign-ups are readable by everyone and writable by nobody",
+      "members": {
+        "host": "adult",
+        "kid": "child"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES ('sh1', ?, '', 'Chapter Hall', '2026-09-12', ?, 'Host', '2026-09-01T00:00:00Z', 0)",
+          "params": [
+            "Fall Festival",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES ('sl1', 'sh1', ?, '', 2, 2, '', 'open', 0, '2026-09-01T00:00:00Z')",
+          "params": [
+            "Setup crew"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES ('g1', 'sh1', 'sl1', 'Marta', 'Bringing a dolly', '2026-09-02T00:00:00Z'), ('g2', 'sh1', 'sl1', 'Ken', '', '2026-09-03T00:00:00Z')"
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id, guest_name FROM app_volunteer__guest_claims WHERE sheet_id = ?",
+          "params": [
+            "sh1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 2,
+            "rowsContain": [
+              {
+                "guest_name": "Marta"
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "DELETE FROM app_volunteer__guest_claims WHERE id = ?",
+          "params": [
+            "g1"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "UPDATE app_volunteer__guest_claims SET guest_name = ? WHERE id = ?",
+          "params": [
+            "Edited",
+            "g1"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, 'sh1', 'sl1', ?, '', '2026-09-04T00:00:00Z')",
+          "params": [
+            "g3",
+            "Forged"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "SELECT id, guest_name FROM app_volunteer__guest_claims WHERE sheet_id = ?",
+          "params": [
+            "sh1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 2,
+            "rowsContain": [
+              {
+                "guest_name": "Marta"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "only adults tune the guest allowance, and it never touches the member allowance",
+      "members": {
+        "host": "adult",
+        "kid": "child"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES ('sh1', ?, '', '', '2026-09-12', ?, 'Host', '2026-09-01T00:00:00Z', 0)",
+          "params": [
+            "Work Party",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES ('sl1', 'sh1', ?, '', 2, 2, '', 'open', 0, '2026-09-01T00:00:00Z')",
+          "params": [
+            "Hauling"
+          ]
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "UPDATE app_volunteer__slots SET guest_capacity = 5 WHERE id = ?",
+          "params": [
+            "sl1"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "kid",
+          "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES ('sh2', ?, '', '', '2026-09-13', ?, 'Kid', '2026-09-01T00:00:00Z', 0)",
+          "params": [
+            "Kid sheet",
+            "{{kid}}"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "UPDATE app_volunteer__slots SET guest_capacity = 0 WHERE id = ?",
+          "params": [
+            "sl1"
+          ],
+          "expect": {
+            "status": 200
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT capacity, guest_capacity FROM app_volunteer__slots WHERE id = ?",
+          "params": [
+            "sl1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "capacity": 2,
+                "guest_capacity": 0
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "neither ledger is writable by app SQL, and they are counted apart",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES ('sh1', ?, '', '', '2026-09-12', ?, 'Host', '2026-09-01T00:00:00Z', 0)",
+          "params": [
+            "Carpool",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES ('sl1', 'sh1', ?, '', 1, 1, '', 'open', 0, '2026-09-01T00:00:00Z')",
+          "params": [
+            "Morning run"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES ('c1', 'sl1', ?, '', '2026-09-02T00:00:00Z')",
+          "params": [
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES ('g1', 'sh1', 'sl1', 'Marta', '', '2026-09-03T00:00:00Z')"
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES ('c2', 'sl1', ?, '', '2026-09-04T00:00:00Z')",
+          "params": [
+            "{{host}}"
+          ],
+          "expect": {
+            "status": 403
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id FROM app_volunteer__slot_claims WHERE slot_id = ?",
+          "params": [
+            "sl1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id FROM app_volunteer__guest_claims WHERE slot_id = ?",
+          "params": [
+            "sl1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "a slot created without a guest allowance is closed to link guests — why the automation must set one",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived, source_event_id) VALUES ('sh1', ?, '', '', '2026-09-12', 'automation', 'Automation', '2026-09-01T00:00:00Z', 0, 'ev-src-1')",
+          "params": [
+            "Help set up"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, created_at) VALUES ('sl-old', 'sh1', ?, 2, '2026-09-01T00:00:00Z')",
+          "params": [
+            "Volunteers (no allowance)"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, created_at) VALUES ('sl-new', 'sh1', ?, 2, 2, '2026-09-01T00:00:00Z')",
+          "params": [
+            "Volunteers"
+          ]
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, capacity, guest_capacity FROM app_volunteer__slots WHERE id = ?",
+          "params": [
+            "sl-old"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "capacity": 2,
+                "guest_capacity": 0
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, capacity, guest_capacity FROM app_volunteer__slots WHERE id = ?",
+          "params": [
+            "sl-new"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "capacity": 2,
+                "guest_capacity": 2
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, created_by FROM app_volunteer__sheets WHERE id = ?",
+          "params": [
+            "sh1"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "created_by": "automation"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

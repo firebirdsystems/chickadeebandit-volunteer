@@ -470,13 +470,13 @@ function renderSheetCard(sheet) {
   const t = sheetTotals(sheet.id);
   const cls = t.filled ? "good" : t.claimed ? "info" : "warn";
   return `
-    <article class="card sheet-card" data-open-sheet="${esc(sheet.id)}">
+    <article class="card sheet-card" data-testid="sheet-card" data-sheet-id="${esc(sheet.id)}" data-open-sheet="${esc(sheet.id)}">
       <div class="head">
         <div>
-          <div class="title">${esc(sheet.title)}</div>
+          <div class="title" data-testid="sheet-card-title">${esc(sheet.title)}</div>
           <div class="meta">${esc(fmtDate(sheet.event_date))}${sheet.location ? ` · ${esc(sheet.location)}` : ""}</div>
         </div>
-        <span class="pill ${cls}">${t.claimed}/${t.capacity} filled</span>
+        <span class="pill ${cls}" data-testid="sheet-card-progress">${t.claimed}/${t.capacity} filled</span>
       </div>
       ${sheet.description ? `<p class="meta">${esc(sheet.description)}</p>` : ""}
       <div class="progress" aria-hidden="true"><span style="width:${t.pct}%"></span></div>
@@ -539,7 +539,7 @@ function renderMine() {
 }
 function renderClaim(claim) {
   return `
-    <span class="claim-chip" ${claim.note ? `title="${esc(claim.note)}"` : ""}>
+    <span class="claim-chip" data-testid="member-claim" ${claim.note ? `title="${esc(claim.note)}"` : ""}>
       <span class="avatar" style="background:${esc(memberColor(claim.member_id, members))}">${esc(initial(memberName(claim.member_id)))}</span>
       ${esc(memberName(claim.member_id))}${claim.note ? ` <span class="muted tiny">· ${esc(claim.note)}</span>` : ""}
     </span>`;
@@ -558,17 +558,18 @@ function renderSlotGuests(slot) {
   const editable = share.enabled && canManage();
   if (!guests.length && !editable) return "";
   return `
-    <div class="slot-guests">
+    <div class="slot-guests" data-testid="slot-guests" data-slot-id="${esc(slot.id)}">
       <div class="slot-guest-head">
         <span class="muted tiny">From the shared link</span>
-        <span class="pill ${isSlotGuestFull(slot, guestClaims) ? "good" : "info"}">${guests.length}/${allowance}</span>
+        <span class="pill ${isSlotGuestFull(slot, guestClaims) ? "good" : "info"}" data-testid="slot-guest-tally">${guests.length}/${allowance}</span>
       </div>
-      ${guests.length ? `<div class="claims">${guests.map(renderGuestClaim).join("")}</div>` : ""}
+      ${guests.length ? `<div class="claims" data-testid="slot-guest-claims">${guests.map(renderGuestClaim).join("")}</div>` : ""}
       ${editable ? `
         <label class="muted tiny slot-guest-cap">
           Guest spots
           <input type="number" min="0" value="${esc(String(allowance))}"
-                 data-guest-cap="${esc(slot.id)}" aria-label="Guest spots for ${esc(slot.title)}" />
+                 data-testid="slot-guest-capacity" data-guest-cap="${esc(slot.id)}"
+                 aria-label="Guest spots for ${esc(slot.title)}" />
         </label>` : ""}
     </div>`;
 }
@@ -576,7 +577,7 @@ function renderSlotGuests(slot) {
 function renderGuestClaim(guest) {
   const name = guest.guest_name || "A guest";
   return `
-    <span class="claim-chip" ${guest.note ? `title="${esc(guest.note)}"` : ""}>
+    <span class="claim-chip" data-testid="guest-claim" ${guest.note ? `title="${esc(guest.note)}"` : ""}>
       <span class="avatar" style="background:var(--hub-border,#e5e7eb)">${esc(initial(name))}</span>
       ${esc(name)}${guest.note ? ` <span class="muted tiny">· ${esc(guest.note)}</span>` : ""}
     </span>`;
@@ -589,7 +590,7 @@ function renderOrphanGuests(sheet) {
   const orphans = unslottedGuestClaims(guestClaims, slots, sheet.id);
   if (!orphans.length) return "";
   return `
-    <section class="card">
+    <section class="card" data-testid="orphan-guests">
       <h2>Sign-ups without a slot <span class="pill info">${orphans.length}</span></h2>
       <p class="muted tiny">These arrived through the shared link for a slot that is no longer on this sheet.</p>
       <div class="claims">${orphans.map(renderGuestClaim).join("")}</div>
@@ -604,31 +605,31 @@ function renderSlot(slot) {
   const iHaveSheetClaim = sheetSlots(slot.sheet_id).some(s => myClaim(s.id));
   let action = "";
   if (mine) {
-    action = `<button class="btn btn-danger btn-sm" data-release="${esc(slot.id)}">Release</button>`;
+    action = `<button class="btn btn-danger btn-sm" data-testid="slot-release" data-release="${esc(slot.id)}">Release</button>`;
   } else if (closed) {
-    action = `<span class="pill">Closed</span>`;
+    action = `<span class="pill" data-testid="slot-closed">Closed</span>`;
   } else if (full) {
-    action = `<button class="btn btn-sm" disabled>Full</button>`;
+    action = `<button class="btn btn-sm" data-testid="slot-full" disabled>Full</button>`;
   } else if (iHaveSheetClaim) {
-    action = `<button class="btn btn-sm" data-swap="${esc(slot.id)}">Move here</button>`;
+    action = `<button class="btn btn-sm" data-testid="slot-move" data-swap="${esc(slot.id)}">Move here</button>`;
   } else {
-    action = `<button class="btn btn-sm" data-claim="${esc(slot.id)}">Sign up</button>`;
+    action = `<button class="btn btn-sm" data-testid="slot-signup" data-claim="${esc(slot.id)}">Sign up</button>`;
   }
   return `
-    <div class="slot">
+    <div class="slot" data-testid="slot-card" data-slot-id="${esc(slot.id)}">
       <div class="slot-top">
         <div>
-          <div class="slot-name">${esc(slot.title)}</div>
+          <div class="slot-name" data-testid="slot-title">${esc(slot.title)}</div>
           ${slot.details ? `<div class="meta">${esc(slot.details)}</div>` : ""}
           ${slot.starts_at ? `<div class="meta tiny">${esc(fmtTime(slot.starts_at))}</div>` : ""}
         </div>
-        <span class="pill ${full ? "good" : "warn"}">${sc.length}/${slot.capacity}</span>
+        <span class="pill ${full ? "good" : "warn"}" data-testid="slot-member-tally">${sc.length}/${slot.capacity}</span>
       </div>
-      <div class="claims">${sc.length ? sc.map(renderClaim).join("") : `<span class="muted tiny">Open</span>`}</div>
+      <div class="claims" data-testid="slot-member-claims">${sc.length ? sc.map(renderClaim).join("") : `<span class="muted tiny">Open</span>`}</div>
       ${renderSlotGuests(slot)}
       <div class="actions">
         ${action}
-        ${canManage() ? `<button class="btn btn-ghost btn-sm" data-toggle="${esc(slot.id)}">${closed ? "Reopen" : "Close"}</button>` : ""}
+        ${canManage() ? `<button class="btn btn-ghost btn-sm" data-testid="slot-toggle" data-toggle="${esc(slot.id)}">${closed ? "Reopen" : "Close"}</button>` : ""}
       </div>
     </div>`;
 }
@@ -642,18 +643,18 @@ function renderDetail() {
     <section class="card stack">
       <div class="head">
         <div>
-          <h1>${esc(sheet.title)}</h1>
+          <h1 data-testid="sheet-title">${esc(sheet.title)}</h1>
           <p class="muted">${esc(fmtDate(sheet.event_date))}${sheet.location ? ` · ${esc(sheet.location)}` : ""}</p>
         </div>
         <div class="tools">
           <span class="pill ${t.filled ? "good" : "info"}">${t.claimed}/${t.capacity} filled</span>
-          ${share.enabled && canManage() ? `<button class="btn btn-ghost btn-sm" data-share="${esc(sheet.id)}">🔗 Share</button>` : ""}
-          ${canManage() ? `<button class="btn btn-quiet-danger" data-archive="${esc(sheet.id)}">Archive</button>` : ""}
+          ${share.enabled && canManage() ? `<button class="btn btn-ghost btn-sm" data-testid="sheet-share" data-share="${esc(sheet.id)}">🔗 Share</button>` : ""}
+          ${canManage() ? `<button class="btn btn-quiet-danger" data-testid="sheet-archive" data-archive="${esc(sheet.id)}">Archive</button>` : ""}
         </div>
       </div>
       ${sheet.description ? `<p>${esc(sheet.description)}</p>` : ""}
     </section>
-    <section class="card">
+    <section class="card" data-testid="slot-list">
       <h2>Slots</h2>
       ${sheetSlots(sheet.id).map(renderSlot).join("") || `<div class="empty">No slots on this sheet.</div>`}
     </section>
@@ -695,11 +696,11 @@ function closeModal() { modalEl?.remove(); modalEl = null; }
 
 // One modal element for the whole app, so opening the share dialog over a claim
 // dialog replaces it rather than stacking two backdrops.
-function openModal(inner, { width = 400 } = {}) {
+function openModal(inner, { width = 400, testid = "modal" } = {}) {
   closeModal();
   modalEl = document.createElement("div");
   modalEl.style.cssText = "position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;";
-  modalEl.innerHTML = `<div class="card" style="max-width:${width}px;width:100%;max-height:90vh;overflow:auto;">${inner}</div>`;
+  modalEl.innerHTML = `<div class="card" data-testid="${testid}" style="max-width:${width}px;width:100%;max-height:90vh;overflow:auto;">${inner}</div>`;
   modalEl.addEventListener("click", e => { if (e.target === modalEl) closeModal(); });
   document.body.appendChild(modalEl);
   return modalEl;
@@ -711,11 +712,11 @@ function openClaimModal(slotId) {
   openModal(`
     <h2 style="margin-bottom:2px;">Sign up — ${esc(slot.title)}</h2>
     <p class="muted tiny" style="margin-bottom:10px;">Add an optional note (e.g. what you're bringing).</p>
-    <div class="field"><label for="m-note">Note</label><input id="m-note" maxlength="200" placeholder="Optional" /></div>
+    <div class="field"><label for="m-note">Note</label><input id="m-note" data-testid="field-claim-note" maxlength="200" placeholder="Optional" /></div>
     <div class="actions" style="margin-top:12px;justify-content:flex-end;">
       <button class="btn btn-ghost btn-sm" data-modal-cancel>Cancel</button>
-      <button class="btn btn-sm" data-modal-claim="${esc(slotId)}">Sign up</button>
-    </div>`);
+      <button class="btn btn-sm" data-testid="claim-submit" data-modal-claim="${esc(slotId)}">Sign up</button>
+    </div>`, { testid: "claim-modal" });
   modalEl.querySelector("#m-note")?.focus();
 }
 async function submitClaim(slotId) {
@@ -741,7 +742,7 @@ async function openShareModal(sheetId) {
     l.itemId === sheetId && !l.revokedAt && new Date(l.expiresAt) > new Date());
 
   const rows = active.map(l => `
-    <div class="share-row">
+    <div class="share-row" data-testid="share-link" data-link-id="${esc(l.id)}">
       <div style="flex:1;min-width:0">
         <input class="share-url" readonly value="${esc(l.url)}" onclick="this.select()" />
         <div class="muted tiny" style="margin-top:3px">
@@ -759,7 +760,7 @@ async function openShareModal(sheetId) {
   // sign-up form itself is premium.
   const premiumControls = _shareEntitled ? `
     <label class="share-opt">
-      <input type="checkbox" id="share-writable" /> Let people sign up for a slot through the link
+      <input type="checkbox" id="share-writable" data-testid="share-writable" /> Let people sign up for a slot through the link
     </label>
     <input id="share-password" type="text" placeholder="Optional password (min 4 chars)" autocomplete="off" />
   ` : "";
@@ -778,11 +779,11 @@ async function openShareModal(sheetId) {
         <option value="720">30 days</option>
         ${_shareEntitled ? `<option value="8760">1 year</option>` : ""}
       </select>
-      <button class="btn btn-sm" data-share-create="${esc(sheetId)}">Create link</button>
+      <button class="btn btn-sm" data-testid="share-create" data-share-create="${esc(sheetId)}">Create link</button>
     </div>
     <div class="actions" style="margin-top:14px;justify-content:flex-end;">
       <button class="btn btn-ghost btn-sm" data-modal-cancel>Close</button>
-    </div>`, { width: 520 });
+    </div>`, { width: 520, testid: "share-modal" });
 }
 
 async function createShareLink(sheetId) {

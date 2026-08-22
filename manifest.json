@@ -1,7 +1,7 @@
 {
   "id": "volunteer",
   "name": "Volunteer Sign-Up",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "SignUpGenius-style slot sheets for potlucks, classroom helpers, carpool coverage, or shift backfills. Members claim, swap, and release capacity-limited slots without overbooking.",
   "entrypoint": "index.html",
   "runtime": "static",
@@ -196,7 +196,7 @@
   "automation_actions": {
     "create_sheet": {
       "title": "Open a sign-up sheet",
-      "description": "Open a sheet with its first slot when another app records something that needs helpers — a potluck, a game day, a work party. Members claim the slot the normal way; capacity is still enforced by the hub's claim endpoint.",
+      "description": "Open a sheet with its first slot when another app records something that needs helpers — a potluck, a game day, a work party. Members claim the slot the normal way; capacity is still enforced by the hub's claim endpoint. The slot's guest allowance mirrors its member capacity, so a sheet opened this way can be shared by link without an organizer retuning it first.",
       "params": {
         "title": {
           "type": "text",
@@ -263,6 +263,7 @@
             "sheet_id": ":sheet_id",
             "title": ":slot_title",
             "capacity": ":capacity",
+            "guest_capacity": ":capacity",
             "created_at": "$now"
           }
         }

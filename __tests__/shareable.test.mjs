@@ -94,6 +94,38 @@ describe("shareable.sheet", () => {
   });
 });
 
+// The other half of that decision. Making automation-opened sheets shareable is
+// worthless if the slot they open cannot take a guest — and it could not: the
+// action wrote `capacity` and left `guest_capacity` to its column default of 0,
+// which the hub reads as full (`>= COALESCE(cap, 0)`). With a required slot
+// select, the public form then had no pickable option at all.
+describe("automation_actions.create_sheet", () => {
+  const slotStep = manifest.automation_actions.create_sheet.steps
+    .find((s) => s.op === "insert" && s.table === "slots");
+
+  it("opens the guest door on the slot it creates", () => {
+    expect(slotStep.values.guest_capacity).toBe(":capacity");
+  });
+
+  it("gives guests the same allowance it gives members", () => {
+    // Two cells, one source: the action takes a single "how many people" param,
+    // so the two ledgers start level and an organizer retunes the guest half
+    // afterwards on the slot card.
+    expect(slotStep.values.guest_capacity).toBe(slotStep.values.capacity);
+    expect(manifest.automation_actions.create_sheet.params.capacity.min).toBe(1);
+  });
+
+  it("writes a column the slots table actually has", () => {
+    expect(columnsOf("slots")).toContain("guest_capacity");
+  });
+
+  it("relies on a default that would otherwise close the slot", () => {
+    // If this default ever became nonzero the omission above would stop being a
+    // bug — and this test would stop being the reason the mapping is required.
+    expect(schema).toMatch(/ADD COLUMN guest_capacity INTEGER NOT NULL DEFAULT 0/);
+  });
+});
+
 describe("shareable.sheet.feed", () => {
   it("reads the guest table the share form writes to", () => {
     expect(feed.table).toBe(submit.table);

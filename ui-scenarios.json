@@ -1,0 +1,190 @@
+{
+  "scenarios": [
+    {
+      "name": "a slot shows member claims and share-link sign-ups as two separate tallies",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES ('ui-sh1', ?, '', 'Chapter Hall', date('now','+3 days'), ?, 'Host', datetime('now'), 0)",
+          "params": [
+            "Fall Festival",
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES ('ui-sl1', 'ui-sh1', ?, '', 2, 3, '', 'open', 0, datetime('now'))",
+          "params": [
+            "Setup crew"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES ('ui-sl2', 'ui-sh1', ?, '', 4, 0, '', 'open', 1, datetime('now'))",
+          "params": [
+            "Cleanup"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES ('ui-c1', 'ui-sl1', ?, '', datetime('now'))",
+          "params": [
+            "{{host}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES ('ui-g1', 'ui-sh1', 'ui-sl1', 'Marta Okafor', '', datetime('now')), ('ui-g2', 'ui-sh1', 'ui-sl1', 'Ken Ibarra', '', datetime('now'))"
+        },
+        {
+          "action": "open"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"sheet-card\"]"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"sheet-card\"][data-sheet-id=\"ui-sh1\"]"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"slot-list\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"slot-card\"]",
+          "count": 2
+        },
+        {
+          "action": "expectText",
+          "text": "1/2",
+          "selector": "[data-testid=\"slot-card\"][data-slot-id=\"ui-sl1\"] [data-testid=\"slot-member-tally\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "2/3",
+          "selector": "[data-testid=\"slot-card\"][data-slot-id=\"ui-sl1\"] [data-testid=\"slot-guest-tally\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "Marta Okafor",
+          "selector": "[data-testid=\"slot-guests\"][data-slot-id=\"ui-sl1\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"slot-card\"][data-slot-id=\"ui-sl1\"] [data-testid=\"guest-claim\"]",
+          "count": 2
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"slot-card\"][data-slot-id=\"ui-sl2\"] [data-testid=\"guest-claim\"]",
+          "count": 0
+        },
+        {
+          "action": "expectNoText",
+          "text": "Marta Okafor",
+          "selector": "[data-testid=\"slot-card\"][data-slot-id=\"ui-sl2\"]"
+        },
+        {
+          "action": "expectText",
+          "text": "0/0",
+          "selector": "[data-testid=\"slot-card\"][data-slot-id=\"ui-sl2\"] [data-testid=\"slot-guest-tally\"]"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"sheet-share\"]"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"slot-guest-capacity\"]",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "name": "a child reads link sign-ups but gets no organizer controls over them",
+      "members": {
+        "kid": "child"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES ('ui-sh1', ?, '', '', date('now','+3 days'), ?, 'Host', datetime('now'), 0)",
+          "params": [
+            "Work Party",
+            "someone-else"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES ('ui-sl1', 'ui-sh1', ?, '', 2, 2, '', 'open', 0, datetime('now'))",
+          "params": [
+            "Hauling"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES ('ui-g1', 'ui-sh1', 'ui-sl1', 'Marta Okafor', '', datetime('now'))"
+        },
+        {
+          "action": "open",
+          "as": "kid"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"sheet-card\"]",
+          "as": "kid"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"sheet-card\"][data-sheet-id=\"ui-sh1\"]",
+          "as": "kid"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"slot-list\"]",
+          "as": "kid"
+        },
+        {
+          "action": "expectText",
+          "text": "Marta Okafor",
+          "selector": "[data-testid=\"slot-guests\"][data-slot-id=\"ui-sl1\"]",
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"slot-guest-capacity\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"sheet-share\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"sheet-archive\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"slot-toggle\"]",
+          "count": 0,
+          "as": "kid"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"slot-signup\"]",
+          "as": "kid"
+        }
+      ]
+    }
+  ]
+}
