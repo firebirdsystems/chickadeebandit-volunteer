@@ -83,6 +83,16 @@
     .slot-name { font-weight: 750; }
     .claims { display: flex; flex-wrap: wrap; gap: 6px; }
     .claim-chip { display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid var(--border); border-radius: 999px; padding: 3px 8px 3px 4px; font-size: .78rem; }
+    .slot-guests { display: grid; gap: 8px; padding: 8px 10px; border-radius: var(--radius); background: #f8fafc; border: 1px dashed var(--border-mid); }
+    .slot-guest-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .slot-guest-cap { display: flex; align-items: center; gap: 6px; }
+    .slot-guest-cap input { width: 64px; padding: 3px 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: .78rem; }
+    .share-row { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .share-url { width: 100%; font-size: .8rem; padding: 4px 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); }
+    .share-opt { display: flex; gap: 6px; align-items: center; font-size: .85rem; margin-top: 10px; }
+    #share-password { width: 100%; margin-top: 8px; padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: .85rem; }
+    .share-create { display: flex; gap: 8px; align-items: center; margin-top: 14px; }
+    .share-create select { padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: .85rem; }
     .avatar { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: .72rem; font-weight: 800; background: #0f766e; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .form { display: grid; gap: 10px; }
@@ -119,10 +129,11 @@
 <div class="app"><div id="root" class="loading">Loading…</div></div>
 
 <script type="module">
-import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch } from "/hub-sdk.js";
+import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch, createShareHelper } from "/hub-sdk.js";
 import {
   canManage as _canManage, isSlotFull as _isSlotFull, claimCount as _claimCount,
   myClaim as _myClaim, sheetTotals as _sheetTotals, claimErrorMessage, searchableFields,
+  guestClaimsForSlot, isSlotGuestFull, unslottedGuestClaims,
 } from "./logic.js";
 
 const CONTEXT     = window.__CONTEXT_URL   ?? "";
@@ -134,12 +145,18 @@ const EVENTS_URL  = window.__EVENTS_URL    ?? "/api/events";
 const APP_ID      = window.__APP_ID        ?? "volunteer";
 const ME          = window.__CURRENT_MEMBER ?? null;
 
+// Share links. `enabled` is false unless the hub injected the URLs, which it
+// only does for a manifest declaring `shareable` — so every control below is
+// gated on it rather than on the app assuming the surface exists.
+const share = createShareHelper(window.__SHARE_CREATE_URL, window.__SHARE_REVOKE_URL, window.__SHARE_LIST_URL);
+
 let members = [];
 let memberMap = new Map();
 let currentMember = null;
 let sheets = [];
 let slots = [];
 let claims = [];
+let guestClaims = [];   // share-link sign-ups (endpoint_only: read-only in here)
 let selectedSheetId = null;
 let view = "sheets";      // "sheets" | "mine" | "create"
 let searchQ = "";       // in-app search (see logic.js searchableFields)
@@ -153,6 +170,7 @@ function claimCount(slotId) { return _claimCount(slotId, claims); }
 function isSlotFull(slot) { return _isSlotFull(slot, claims); }
 function myClaim(slotId) { return _myClaim(slotId, claims, currentMember?.id); }
 function sheetTotals(sheetId) { return _sheetTotals(sheetId, slots, claims); }
+function slotGuests(slotId) { return guestClaimsForSlot(guestClaims, slotId); }
 
 const nowIso = () => new Date().toISOString();
 const uid = (p) => `${p}-${crypto.randomUUID()}`;
@@ -231,23 +249,30 @@ function seedDemo() {
     created_at: nowIso(), archived: 0,
   }];
   slots = [
-    { id: "slot-setup", sheet_id: sheetId, title: "Setup crew", details: "Tables & signage", capacity: 3, starts_at: "", status: "open", sort_order: 0, created_at: nowIso() },
-    { id: "slot-booth", sheet_id: sheetId, title: "Booth (afternoon)", details: "", capacity: 2, starts_at: "", status: "open", sort_order: 1, created_at: nowIso() },
-    { id: "slot-clean", sheet_id: sheetId, title: "Cleanup", details: "", capacity: 4, starts_at: "", status: "open", sort_order: 2, created_at: nowIso() },
+    { id: "slot-setup", sheet_id: sheetId, title: "Setup crew", details: "Tables & signage", capacity: 3, guest_capacity: 3, starts_at: "", status: "open", sort_order: 0, created_at: nowIso() },
+    { id: "slot-booth", sheet_id: sheetId, title: "Booth (afternoon)", details: "", capacity: 2, guest_capacity: 2, starts_at: "", status: "open", sort_order: 1, created_at: nowIso() },
+    { id: "slot-clean", sheet_id: sheetId, title: "Cleanup", details: "", capacity: 4, guest_capacity: 0, starts_at: "", status: "open", sort_order: 2, created_at: nowIso() },
   ];
   claims = [{ id: "c-1", slot_id: "slot-booth", member_id: "demo-2", note: "", created_at: nowIso() }];
+  guestClaims = [
+    { id: "g-1", sheet_id: sheetId, slot_id: "slot-setup", guest_name: "Marta", note: "Can bring a dolly", created_at: nowIso() },
+  ];
 }
 
 async function loadData() {
   if (!DB) { seedDemo(); return; }
-  const [sheetRows, slotRows, claimRows] = await Promise.all([
+  const [sheetRows, slotRows, claimRows, guestRows] = await Promise.all([
     dbq("SELECT * FROM app_volunteer__sheets WHERE archived = 0 ORDER BY event_date ASC, created_at ASC"),
     dbq("SELECT * FROM app_volunteer__slots ORDER BY sort_order ASC, title ASC"),
     dbq("SELECT * FROM app_volunteer__slot_claims ORDER BY created_at ASC"),
+    // Same order the public feed renders in (manifest shareable.sheet.feed,
+    // order_column created_at / oldest), so the two views agree.
+    dbq("SELECT * FROM app_volunteer__guest_claims ORDER BY created_at ASC"),
   ]);
   sheets = sheetRows.rows.map(s => ({ ...s, archived: !!s.archived }));
   slots = slotRows.rows;
   claims = claimRows.rows;
+  guestClaims = guestRows.rows;
 }
 
 async function refresh() {
@@ -287,7 +312,10 @@ async function createSheet(form) {
     id: uid("sheet"), title, description, location, event_date,
     created_by: currentMember.id, created_by_name: currentMember.name, created_at: nowIso(), archived: 0,
   };
-  const newSlots = cleanSlots.map(s => ({ ...s, id: uid("slot"), sheet_id: sheet.id, details: "", status: "open", created_at: nowIso() }));
+  // guest_capacity mirrors the member allowance at creation: a new slot is as
+  // open to share-link guests as it is to members until an organizer retunes it
+  // on the slot card. It stays inert until someone mints a WRITABLE link.
+  const newSlots = cleanSlots.map(s => ({ ...s, id: uid("slot"), sheet_id: sheet.id, details: "", status: "open", guest_capacity: s.capacity, created_at: nowIso() }));
   try {
     if (DB) {
       await dbq(
@@ -297,9 +325,9 @@ async function createSheet(form) {
       );
       for (const s of newSlots) {
         await dbq(
-          `INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, starts_at, status, sort_order, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?)`,
-          [s.id, s.sheet_id, s.title, s.details, s.capacity, s.starts_at, s.sort_order, s.created_at]
+          `INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 'open', ?, ?)`,
+          [s.id, s.sheet_id, s.title, s.details, s.capacity, s.guest_capacity, s.starts_at, s.sort_order, s.created_at]
         );
       }
     }
@@ -398,6 +426,28 @@ async function toggleSlotStatus(slotId) {
   } catch (e) { showError(e.message); }
 }
 
+// The guest allowance the hub enforces on the public form. Nothing else in the
+// app writes it, and the hub fails CLOSED at zero — that is how an organizer
+// closes one slot to link guests while members keep claiming it. Closing the
+// slot outright (status != "open") also removes it from the public form, via
+// the values_from `where` filter, but that shuts members out too.
+async function setGuestCapacity(slotId, raw) {
+  if (!canManage()) return;
+  const slot = slots.find(s => s.id === slotId);
+  if (!slot) return;
+  const next = Math.max(0, Math.floor(Number(raw) || 0));
+  if (next === Number(slot.guest_capacity || 0)) return;
+  try {
+    if (DB) await dbq("UPDATE app_volunteer__slots SET guest_capacity = ? WHERE id = ?", [next, slotId]);
+    const i = slots.findIndex(s => s.id === slotId);
+    if (i !== -1) slots[i] = { ...slots[i], guest_capacity: next };
+    render();
+  } catch (e) {
+    showError(e.message);
+    render();
+  }
+}
+
 // draft slot editing
 function addDraftSlot() { draftSlots.push({ title: "", capacity: 1, starts_at: "" }); render(); }
 function updateDraft(i, field, value) {
@@ -494,6 +544,58 @@ function renderClaim(claim) {
       ${esc(memberName(claim.member_id))}${claim.note ? ` <span class="muted tiny">· ${esc(claim.note)}</span>` : ""}
     </span>`;
 }
+// The share-link half of a slot. Member claims render above; these sit below,
+// tallied against `slots.guest_capacity` rather than `capacity`, because the
+// hub counts only `guest_claims` rows against that allowance — the two numbers
+// are never added together.
+//
+// The rows are read-only: `guest_claims` is endpoint_only, so nothing in the
+// app may edit or delete a sign-up an anonymous visitor authored. The allowance
+// input is the only control here, and it writes to `slots` (adult_writable).
+function renderSlotGuests(slot) {
+  const guests = slotGuests(slot.id);
+  const allowance = Number(slot.guest_capacity || 0);
+  const editable = share.enabled && canManage();
+  if (!guests.length && !editable) return "";
+  return `
+    <div class="slot-guests">
+      <div class="slot-guest-head">
+        <span class="muted tiny">From the shared link</span>
+        <span class="pill ${isSlotGuestFull(slot, guestClaims) ? "good" : "info"}">${guests.length}/${allowance}</span>
+      </div>
+      ${guests.length ? `<div class="claims">${guests.map(renderGuestClaim).join("")}</div>` : ""}
+      ${editable ? `
+        <label class="muted tiny slot-guest-cap">
+          Guest spots
+          <input type="number" min="0" value="${esc(String(allowance))}"
+                 data-guest-cap="${esc(slot.id)}" aria-label="Guest spots for ${esc(slot.title)}" />
+        </label>` : ""}
+    </div>`;
+}
+
+function renderGuestClaim(guest) {
+  const name = guest.guest_name || "A guest";
+  return `
+    <span class="claim-chip" ${guest.note ? `title="${esc(guest.note)}"` : ""}>
+      <span class="avatar" style="background:var(--hub-border,#e5e7eb)">${esc(initial(name))}</span>
+      ${esc(name)}${guest.note ? ` <span class="muted tiny">· ${esc(guest.note)}</span>` : ""}
+    </span>`;
+}
+
+// Sign-ups whose slot no longer exists. The public form requires a slot, so
+// these only appear when a slot is removed after the fact — listing them keeps
+// a real person's commitment visible instead of dropping it silently.
+function renderOrphanGuests(sheet) {
+  const orphans = unslottedGuestClaims(guestClaims, slots, sheet.id);
+  if (!orphans.length) return "";
+  return `
+    <section class="card">
+      <h2>Sign-ups without a slot <span class="pill info">${orphans.length}</span></h2>
+      <p class="muted tiny">These arrived through the shared link for a slot that is no longer on this sheet.</p>
+      <div class="claims">${orphans.map(renderGuestClaim).join("")}</div>
+    </section>`;
+}
+
 function renderSlot(slot) {
   const sc = slotClaims(slot.id);
   const mine = myClaim(slot.id);
@@ -523,6 +625,7 @@ function renderSlot(slot) {
         <span class="pill ${full ? "good" : "warn"}">${sc.length}/${slot.capacity}</span>
       </div>
       <div class="claims">${sc.length ? sc.map(renderClaim).join("") : `<span class="muted tiny">Open</span>`}</div>
+      ${renderSlotGuests(slot)}
       <div class="actions">
         ${action}
         ${canManage() ? `<button class="btn btn-ghost btn-sm" data-toggle="${esc(slot.id)}">${closed ? "Reopen" : "Close"}</button>` : ""}
@@ -544,6 +647,7 @@ function renderDetail() {
         </div>
         <div class="tools">
           <span class="pill ${t.filled ? "good" : "info"}">${t.claimed}/${t.capacity} filled</span>
+          ${share.enabled && canManage() ? `<button class="btn btn-ghost btn-sm" data-share="${esc(sheet.id)}">🔗 Share</button>` : ""}
           ${canManage() ? `<button class="btn btn-quiet-danger" data-archive="${esc(sheet.id)}">Archive</button>` : ""}
         </div>
       </div>
@@ -552,7 +656,8 @@ function renderDetail() {
     <section class="card">
       <h2>Slots</h2>
       ${sheetSlots(sheet.id).map(renderSlot).join("") || `<div class="empty">No slots on this sheet.</div>`}
-    </section>`;
+    </section>
+    ${renderOrphanGuests(sheet)}`;
 }
 function renderCreate() {
   return `
@@ -587,23 +692,30 @@ function renderCreate() {
 // ── claim modal (optional "what are you bringing / note") ──
 let modalEl = null;
 function closeModal() { modalEl?.remove(); modalEl = null; }
-function openClaimModal(slotId) {
-  const slot = slots.find(s => s.id === slotId);
-  if (!slot) return;
+
+// One modal element for the whole app, so opening the share dialog over a claim
+// dialog replaces it rather than stacking two backdrops.
+function openModal(inner, { width = 400 } = {}) {
   closeModal();
   modalEl = document.createElement("div");
   modalEl.style.cssText = "position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;";
-  modalEl.innerHTML = `<div class="card" style="max-width:400px;width:100%;">
+  modalEl.innerHTML = `<div class="card" style="max-width:${width}px;width:100%;max-height:90vh;overflow:auto;">${inner}</div>`;
+  modalEl.addEventListener("click", e => { if (e.target === modalEl) closeModal(); });
+  document.body.appendChild(modalEl);
+  return modalEl;
+}
+
+function openClaimModal(slotId) {
+  const slot = slots.find(s => s.id === slotId);
+  if (!slot) return;
+  openModal(`
     <h2 style="margin-bottom:2px;">Sign up — ${esc(slot.title)}</h2>
     <p class="muted tiny" style="margin-bottom:10px;">Add an optional note (e.g. what you're bringing).</p>
     <div class="field"><label for="m-note">Note</label><input id="m-note" maxlength="200" placeholder="Optional" /></div>
     <div class="actions" style="margin-top:12px;justify-content:flex-end;">
       <button class="btn btn-ghost btn-sm" data-modal-cancel>Cancel</button>
       <button class="btn btn-sm" data-modal-claim="${esc(slotId)}">Sign up</button>
-    </div>
-  </div>`;
-  modalEl.addEventListener("click", e => { if (e.target === modalEl) closeModal(); });
-  document.body.appendChild(modalEl);
+    </div>`);
   modalEl.querySelector("#m-note")?.focus();
 }
 async function submitClaim(slotId) {
@@ -613,6 +725,94 @@ async function submitClaim(slotId) {
   const ok = await claimSlot(slotId, note);
   if (ok) closeModal();
   else if (btn) { btn.disabled = false; btn.textContent = "Sign up"; }
+}
+
+// ── share links ───────────────────────────────────────────────────────────────
+let _shareLinks = [];       // last fetch, for copy-by-id lookups
+let _shareEntitled = false; // premium `sharing` capability
+
+async function openShareModal(sheetId) {
+  const sheet = sheets.find(s => s.id === sheetId);
+  if (!sheet) return;
+  const status = await share.status();
+  _shareLinks = status.links;
+  _shareEntitled = status.entitled;
+  const active = _shareLinks.filter(l =>
+    l.itemId === sheetId && !l.revokedAt && new Date(l.expiresAt) > new Date());
+
+  const rows = active.map(l => `
+    <div class="share-row">
+      <div style="flex:1;min-width:0">
+        <input class="share-url" readonly value="${esc(l.url)}" onclick="this.select()" />
+        <div class="muted tiny" style="margin-top:3px">
+          Expires ${new Date(l.expiresAt).toLocaleDateString()} · ${l.viewCount} view${l.viewCount === 1 ? "" : "s"}${
+            l.writable ? ` · ${l.submissionCount} sign-up${l.submissionCount === 1 ? "" : "s"} · ✍️ collects sign-ups` : ""}${
+            l.hasPassword ? " · 🔒 password" : ""}
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" data-share-copy="${esc(l.id)}">Copy</button>
+      <button class="btn btn-danger btn-sm" data-share-revoke="${esc(l.id)}" data-sheet-id="${esc(sheetId)}">Revoke</button>
+    </div>`).join("");
+
+  // Premium (`sharing`) controls: a writable link, a password, a long expiry.
+  // A read-only link still shows the sheet and who has signed up; only the
+  // sign-up form itself is premium.
+  const premiumControls = _shareEntitled ? `
+    <label class="share-opt">
+      <input type="checkbox" id="share-writable" /> Let people sign up for a slot through the link
+    </label>
+    <input id="share-password" type="text" placeholder="Optional password (min 4 chars)" autocomplete="off" />
+  ` : "";
+
+  openModal(`
+    <h2 style="margin-bottom:2px;">Share "${esc(sheet.title)}"</h2>
+    <p class="muted tiny" style="margin-bottom:10px;">
+      Anyone with the link can see the sheet and who has signed up — no account needed. Links expire automatically.
+    </p>
+    ${rows || `<p class="muted tiny" style="padding:8px 0">No active links yet.</p>`}
+    ${premiumControls}
+    <div class="share-create">
+      <select id="share-expiry">
+        <option value="24">1 day</option>
+        <option value="168" selected>7 days</option>
+        <option value="720">30 days</option>
+        ${_shareEntitled ? `<option value="8760">1 year</option>` : ""}
+      </select>
+      <button class="btn btn-sm" data-share-create="${esc(sheetId)}">Create link</button>
+    </div>
+    <div class="actions" style="margin-top:14px;justify-content:flex-end;">
+      <button class="btn btn-ghost btn-sm" data-modal-cancel>Close</button>
+    </div>`, { width: 520 });
+}
+
+async function createShareLink(sheetId) {
+  const sheet = sheets.find(s => s.id === sheetId);
+  const hours = Number(document.getElementById("share-expiry")?.value) || undefined;
+  const writable = !!document.getElementById("share-writable")?.checked;
+  const password = document.getElementById("share-password")?.value?.trim() || undefined;
+  const btn = modalEl?.querySelector("[data-share-create]");
+  if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
+  try {
+    const link = await share.create("sheet", sheetId, { expiresInHours: hours, label: sheet?.title, writable, password });
+    try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
+    await openShareModal(sheetId);
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = "Create link"; }
+    hubAlert("Couldn't create share link", { description: err.message });
+  }
+}
+
+async function copyShareLink(id) {
+  const link = _shareLinks.find(l => l.id === id);
+  if (!link) return;
+  try { await navigator.clipboard.writeText(link.url); }
+  catch { hubAlert("Couldn't copy — select the link text and copy it manually."); }
+}
+
+async function revokeShareLink(id, sheetId) {
+  if (!await hubConfirm("Revoke this share link?", { description: "Anyone using it will immediately lose access.", confirmLabel: "Revoke" })) return;
+  try { await share.revoke(id); await openShareModal(sheetId); }
+  catch (err) { hubAlert("Couldn't revoke share link", { description: err.message }); }
 }
 
 function render() {
@@ -643,11 +843,22 @@ document.addEventListener("click", (event) => {
   if (t.hasAttribute("data-release")) { releaseClaim(t.getAttribute("data-release")); return; }
   if (t.hasAttribute("data-toggle")) { toggleSlotStatus(t.getAttribute("data-toggle")); return; }
   if (t.hasAttribute("data-archive")) { archiveSheet(t.getAttribute("data-archive")); return; }
+  if (t.hasAttribute("data-share")) { openShareModal(t.getAttribute("data-share")); return; }
+  if (t.hasAttribute("data-share-create")) { createShareLink(t.getAttribute("data-share-create")); return; }
+  if (t.hasAttribute("data-share-copy")) { copyShareLink(t.getAttribute("data-share-copy")); return; }
+  if (t.hasAttribute("data-share-revoke")) { revokeShareLink(t.getAttribute("data-share-revoke"), t.getAttribute("data-sheet-id")); return; }
 });
 document.addEventListener("input", (event) => {
   const input = event.target.closest("[data-draft]");
   if (!input) return;
   updateDraft(Number(input.getAttribute("data-draft")), input.getAttribute("data-field"), input.value);
+});
+// "change", not "input": the allowance write re-renders, and a re-render on
+// every keystroke would tear the field out from under the cursor.
+document.addEventListener("change", (event) => {
+  const input = event.target.closest("[data-guest-cap]");
+  if (!input) return;
+  setGuestCapacity(input.getAttribute("data-guest-cap"), input.value);
 });
 document.addEventListener("submit", (event) => {
   if (event.target.id !== "create-form") return;

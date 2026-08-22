@@ -1,15 +1,26 @@
 {
   "id": "volunteer",
   "name": "Volunteer Sign-Up",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "SignUpGenius-style slot sheets for potlucks, classroom helpers, carpool coverage, or shift backfills. Members claim, swap, and release capacity-limited slots without overbooking.",
   "entrypoint": "index.html",
   "runtime": "static",
   "category": "organization",
-  "tags": ["signup", "volunteer", "slots", "events", "slot-claims"],
-  "contexts": ["household", "shared_space"],
+  "tags": [
+    "signup",
+    "volunteer",
+    "slots",
+    "events",
+    "slot-claims"
+  ],
+  "contexts": [
+    "household",
+    "shared_space"
+  ],
   "data_access": {
-    "reads": ["family.members"],
+    "reads": [
+      "family.members"
+    ],
     "writes": []
   },
   "permissions": {
@@ -17,7 +28,14 @@
     "requires_approval": false
   },
   "storage": "db",
-  "db_plaintext_columns": ["capacity", "note", "event_date"],
+  "db_plaintext_columns": [
+    "capacity",
+    "guest_capacity",
+    "note",
+    "event_date",
+    "archived",
+    "guest_name"
+  ],
   "row_policies": {
     "sheets": {
       "kind": "adult_writable",
@@ -30,34 +48,187 @@
     "slot_claims": {
       "kind": "endpoint_only",
       "read": "everyone"
+    },
+    "guest_claims": {
+      "kind": "endpoint_only",
+      "read": "everyone",
+      "max_rows": 200
+    }
+  },
+  "shareable": {
+    "sheet": {
+      "table": "sheets",
+      "title_column": "title",
+      "columns": [
+        {
+          "column": "event_date",
+          "label": "When",
+          "format": "date"
+        },
+        {
+          "column": "location",
+          "label": "Where"
+        },
+        {
+          "column": "description",
+          "label": "Details",
+          "format": "multiline"
+        }
+      ],
+      "visible_where": {
+        "column": "archived",
+        "values": [
+          "0"
+        ]
+      },
+      "aggregates": [
+        {
+          "label": "Signed up through this link",
+          "table": "guest_claims",
+          "fk_column": "sheet_id",
+          "op": "count"
+        },
+        {
+          "label": "Slots they picked",
+          "table": "guest_claims",
+          "fk_column": "sheet_id",
+          "op": "list",
+          "value_column": "slot_id",
+          "lookup": {
+            "table": "slots",
+            "label_column": "title"
+          },
+          "max_items": 100
+        }
+      ],
+      "feed": {
+        "label": "Who has signed up",
+        "table": "guest_claims",
+        "fk_column": "sheet_id",
+        "columns": [
+          {
+            "column": "guest_name",
+            "label": "Name",
+            "role": "heading"
+          },
+          {
+            "column": "note",
+            "label": "Note",
+            "role": "detail"
+          },
+          {
+            "column": "created_at",
+            "label": "Signed up",
+            "format": "datetime",
+            "role": "timestamp"
+          }
+        ],
+        "order_column": "created_at",
+        "order": "oldest",
+        "max_items": 200,
+        "empty_text": "Nobody has signed up through this link yet."
+      },
+      "submit": {
+        "table": "guest_claims",
+        "fk_column": "sheet_id",
+        "fields": [
+          {
+            "column": "guest_name",
+            "label": "Your name",
+            "type": "text",
+            "required": true,
+            "max_length": 80
+          },
+          {
+            "column": "slot_id",
+            "label": "Which slot can you cover?",
+            "type": "select",
+            "required": true,
+            "values_from": {
+              "table": "slots",
+              "fk_column": "sheet_id",
+              "id_column": "id",
+              "label_column": "title",
+              "capacity_column": "guest_capacity",
+              "where": [
+                {
+                  "column": "status",
+                  "values": [
+                    "open"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "column": "note",
+            "label": "Anything the organizer should know?",
+            "type": "text",
+            "required": false,
+            "max_length": 200
+          }
+        ],
+        "max_submissions": 200,
+        "event": "volunteer.guest_signed_up"
+      }
     }
   },
   "slot_claims": {
     "slot_table": "slots",
     "capacity_column": "capacity",
     "slot_status_column": "status",
-    "slot_open_values": ["open"],
+    "slot_open_values": [
+      "open"
+    ],
     "claims_table": "slot_claims",
     "slot_fk_column": "slot_id",
     "member_column": "member_id",
     "created_at_column": "created_at",
     "one_claim_per_member": true,
     "allow_release": true,
-    "allowed_columns": ["note"],
-    "max_text_lengths": { "note": 200 }
+    "allowed_columns": [
+      "note"
+    ],
+    "max_text_lengths": {
+      "note": 200
+    }
   },
   "automation_actions": {
     "create_sheet": {
       "title": "Open a sign-up sheet",
       "description": "Open a sheet with its first slot when another app records something that needs helpers — a potluck, a game day, a work party. Members claim the slot the normal way; capacity is still enforced by the hub's claim endpoint.",
       "params": {
-        "title": { "type": "text", "label": "Sheet title", "required": true },
-        "event_date": { "type": "text", "label": "Date (yyyy-mm-dd)", "required": true },
-        "location": { "type": "text", "label": "Location", "default": "" },
-        "slot_title": { "type": "text", "label": "First slot", "default": "Volunteers" },
-        "capacity": { "type": "integer", "label": "How many people", "default": 1, "min": 1 }
+        "title": {
+          "type": "text",
+          "label": "Sheet title",
+          "required": true
+        },
+        "event_date": {
+          "type": "text",
+          "label": "Date (yyyy-mm-dd)",
+          "required": true
+        },
+        "location": {
+          "type": "text",
+          "label": "Location",
+          "default": ""
+        },
+        "slot_title": {
+          "type": "text",
+          "label": "First slot",
+          "default": "Volunteers"
+        },
+        "capacity": {
+          "type": "integer",
+          "label": "How many people",
+          "default": 1,
+          "min": 1
+        }
       },
-      "dedupe": { "table": "sheets", "column": "source_event_id" },
+      "dedupe": {
+        "table": "sheets",
+        "column": "source_event_id"
+      },
       "steps": [
         {
           "op": "insert",
@@ -76,8 +247,12 @@
         {
           "op": "lookup",
           "table": "sheets",
-          "where": { "source_event_id": "$event_id" },
-          "bind": { "sheet_id": "id" },
+          "where": {
+            "source_event_id": "$event_id"
+          },
+          "bind": {
+            "sheet_id": "id"
+          },
           "on_missing": "error"
         },
         {
@@ -102,19 +277,43 @@
       "target_app_id": "volunteer",
       "action_id": "create_sheet",
       "param_map": {
-        "title": { "kind": "payload_field", "value": "title" },
-        "event_date": { "kind": "payload_field", "value": "start_date" },
-        "slot_title": { "kind": "const", "value": "Help set up" },
-        "capacity": { "kind": "const", "value": 2 }
+        "title": {
+          "kind": "payload_field",
+          "value": "title"
+        },
+        "event_date": {
+          "kind": "payload_field",
+          "value": "start_date"
+        },
+        "slot_title": {
+          "kind": "const",
+          "value": "Help set up"
+        },
+        "capacity": {
+          "kind": "const",
+          "value": 2
+        }
       }
     }
   ],
-  "publishes": ["volunteer.sheet_created", "volunteer.slot_claimed"],
+  "publishes": [
+    "volunteer.sheet_created",
+    "volunteer.slot_claimed",
+    "volunteer.guest_signed_up"
+  ],
   "member_references": {
-    "sheets": { "column": "created_by", "on_removed": "keep" },
-    "slot_claims": { "column": "member_id", "on_removed": "delete" }
+    "sheets": {
+      "column": "created_by",
+      "on_removed": "keep"
+    },
+    "slot_claims": {
+      "column": "member_id",
+      "on_removed": "delete"
+    }
   },
-  "nav": { "label": "Volunteer" },
+  "nav": {
+    "label": "Volunteer"
+  },
   "agenda": {
     "kind": "event",
     "label": "Volunteer",
@@ -128,9 +327,17 @@
       "kind": "sql",
       "query": "SELECT title AS title, NULLIF(location, '') AS subtitle, event_date AS at FROM app_volunteer__sheets WHERE archived = 0 AND event_date >= :today ORDER BY event_date LIMIT 3"
     },
-    "display": { "template": "list", "title": "title", "subtitle": "subtitle", "when": "at" }
+    "display": {
+      "template": "list",
+      "title": "title",
+      "subtitle": "subtitle",
+      "when": "at"
+    }
   },
-  "widget": { "label": "Volunteer", "size": "small" },
+  "widget": {
+    "label": "Volunteer",
+    "size": "small"
+  },
   "resource_limits": {
     "max_db_bytes": 52428800
   },
@@ -138,6 +345,9 @@
   "ai_access": {
     "allowed": true,
     "mode": "read",
-    "db_exports": ["open_slots", "signup_summary"]
+    "db_exports": [
+      "open_slots",
+      "signup_summary"
+    ]
   }
 }

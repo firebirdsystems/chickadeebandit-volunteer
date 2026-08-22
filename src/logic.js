@@ -32,6 +32,39 @@ export function sheetTotals(sheetId, slots, claims) {
   return { claimed, capacity, pct, filled: capacity > 0 && claimed >= capacity };
 }
 
+// ── Share-link guests ─────────────────────────────────────────────────────────
+// Rows in `guest_claims`, written only by the hub's external submit path. They
+// are a SEPARATE ledger from member `slot_claims`: the hub bounds them against
+// `slots.guest_capacity` by counting the submit table alone, so the two tallies
+// are never added together and never compared to the same allowance.
+
+// Guest sign-ups naming one slot. An empty slot id matches nothing — a row that
+// lost its slot is an orphan (see unslottedGuestClaims), not a member of every
+// slot's list.
+export function guestClaimsForSlot(guestClaims, slotId) {
+  if (!slotId) return [];
+  return guestClaims.filter((g) => g.slot_id === slotId);
+}
+
+export function guestClaimCount(guestClaims, slotId) {
+  return guestClaimsForSlot(guestClaims, slotId).length;
+}
+
+// A slot is closed to link guests when its guest tally reaches its guest
+// allowance. Mirrors the hub's own claim predicate (`>= COALESCE(cap, 0)`), so
+// a zero or missing allowance reads full here exactly as it does server-side.
+export function isSlotGuestFull(slot, guestClaims) {
+  return guestClaimCount(guestClaims, slot.id) >= Number(slot.guest_capacity || 0);
+}
+
+// Guest sign-ups on a sheet that name no slot the sheet still has. The public
+// form requires a slot, so these can only come from a slot removed after the
+// fact — surface them rather than let a real sign-up vanish from the sheet.
+export function unslottedGuestClaims(guestClaims, slots, sheetId) {
+  const live = new Set(slots.filter((s) => s.sheet_id === sheetId).map((s) => s.id));
+  return guestClaims.filter((g) => g.sheet_id === sheetId && !live.has(g.slot_id));
+}
+
 // Human label for a slot_claims 409 reason returned by the hub endpoints.
 export function claimErrorMessage(reason) {
   switch (reason) {
