@@ -186,6 +186,9 @@ function fmtTime(v) {
   return new Intl.DateTimeFormat(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" }).format(d);
 }
 function sheetSlots(sheetId) {
+  // The alphabetical tiebreak lives here, not in SQL: `title` is encrypted at
+  // rest, so ORDER BY title would sort AES ciphertext. This runs after the hub
+  // decrypts, so it is the only place the comparison is meaningful.
   return slots.filter(s => s.sheet_id === sheetId).sort((a, b) => (a.sort_order - b.sort_order) || a.title.localeCompare(b.title));
 }
 function slotClaims(slotId) {
@@ -262,7 +265,7 @@ async function loadData() {
   if (!DB) { seedDemo(); return; }
   const [sheetRows, slotRows, claimRows, guestRows] = await Promise.all([
     dbq("SELECT * FROM app_volunteer__sheets WHERE archived = 0 ORDER BY event_date ASC, created_at ASC"),
-    dbq("SELECT * FROM app_volunteer__slots ORDER BY sort_order ASC, title ASC"),
+    dbq("SELECT * FROM app_volunteer__slots ORDER BY sort_order ASC, id ASC"),
     dbq("SELECT * FROM app_volunteer__slot_claims ORDER BY created_at ASC"),
     // Same order the public feed renders in (manifest shareable.sheet.feed,
     // order_column created_at / oldest), so the two views agree.

@@ -30,7 +30,7 @@
   "storage": "db",
   "preload": {
     "sheets": {"sql": "SELECT * FROM app_volunteer__sheets WHERE archived = 0 ORDER BY event_date ASC, created_at ASC"},
-    "slots": {"sql": "SELECT * FROM app_volunteer__slots ORDER BY sort_order ASC, title ASC"}
+    "slots": {"sql": "SELECT * FROM app_volunteer__slots ORDER BY sort_order ASC, id ASC"}
   },
   "db_plaintext_columns": [
     "capacity",
