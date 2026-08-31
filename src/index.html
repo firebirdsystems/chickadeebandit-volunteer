@@ -129,7 +129,7 @@
 <div class="app"><div id="root" class="loading">Loading…</div></div>
 
 <script type="module">
-import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch, createShareHelper } from "/hub-sdk.js";
+import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch, createShareHelper, hubToday as today } from "/hub-sdk.js";
 import {
   canManage as _canManage, isSlotFull as _isSlotFull, claimCount as _claimCount,
   myClaim as _myClaim, sheetTotals as _sheetTotals, claimErrorMessage, searchableFields,
@@ -174,7 +174,6 @@ function slotGuests(slotId) { return guestClaimsForSlot(guestClaims, slotId); }
 
 const nowIso = () => new Date().toISOString();
 const uid = (p) => `${p}-${crypto.randomUUID()}`;
-const today = () => new Date().toISOString().slice(0, 10);
 function memberName(id) { return memberMap.get(id)?.name ?? "Member"; }
 function fmtDate(v) {
   if (!v) return "";
