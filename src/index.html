@@ -265,7 +265,12 @@ async function loadData() {
   if (!DB) { seedDemo(); return; }
   const [sheetRows, slotRows, claimRows, guestRows] = await Promise.all([
     dbq("SELECT * FROM app_volunteer__sheets WHERE archived = 0 ORDER BY event_date ASC, created_at ASC"),
-    dbq("SELECT * FROM app_volunteer__slots ORDER BY sort_order ASC, id ASC"),
+    // Slots are scoped to the same non-archived sheets the read above loads:
+    // every consumer filters by sheet_id, and the sheet list never holds an
+    // archived sheet, so slots under one could not be reached. A JOIN rather
+    // than IN (SELECT …) because the rewriter fails closed on a governed table
+    // named only inside a subquery.
+    dbq("SELECT s.* FROM app_volunteer__slots s JOIN app_volunteer__sheets sh ON sh.id = s.sheet_id AND sh.archived = 0 ORDER BY s.sort_order ASC, s.id ASC"),
     dbq("SELECT * FROM app_volunteer__slot_claims ORDER BY created_at ASC"),
     // Same order the public feed renders in (manifest shareable.sheet.feed,
     // order_column created_at / oldest), so the two views agree.
