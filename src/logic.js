@@ -83,3 +83,60 @@ export function claimErrorMessage(reason) {
 export function searchableFields(item) {
   return [item.title, item.description, item.location];
 }
+
+// ── Calendar export ───────────────────────────────────────────────────────────
+
+export const CALENDAR_EXPORT_HORIZON_DAYS = 180;
+export const CALENDAR_EXPORT_MAX_EVENTS = 100;
+
+function atMidnight(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+}
+
+/** Local YYYY-MM-DD for a Date. Only ever used to project the horizon forward. */
+function isoDay(d) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/**
+ * Build the `calendar_events` payload from upcoming sign-up sheets.
+ *
+ * Shape matches what the hub's cross-app aggregation consumes — see
+ * `normalizeExportedEvent` in packages/hub/src/cloudflare/calendar-feed.ts.
+ * The SHEET is the dated thing: `event_date` is a bare day with no time, so
+ * every entry is all-day. Slots are deliberately not exported — `starts_at`
+ * is not in `db_plaintext_columns`, so it is encrypted at rest and carries no
+ * day of its own, and a slot adds no date the sheet does not already have.
+ * Claims are not exported either: they are a person's name against a shift,
+ * and this payload is scope-wide.
+ *
+ * `description` is deliberately NOT exported. This payload reaches the
+ * household's ICS feed, which external calendar services fetch, and the
+ * description is free text an organizer wrote for the household. Location IS
+ * exported because telling you where to go is what a calendar entry is FOR.
+ */
+export function buildCalendarEvents(sheets, todayIso, from = new Date()) {
+  const horizon = isoDay(new Date(atMidnight(from).getTime() + CALENDAR_EXPORT_HORIZON_DAYS * 86400000));
+  return sheets
+    // `event_date` defaults to the empty string, and a sheet with no date has
+    // nothing to put on a calendar — an empty value would also sort ahead of
+    // every real one and eat the cap.
+    .filter((s) => !Number(s.archived) && s.event_date && s.event_date >= todayIso && s.event_date <= horizon)
+    .map((s) => ({
+      id: s.id,
+      title: s.title,
+      description: "Volunteer sheet",
+      location: s.location || "",
+      start: s.event_date,
+      end: s.event_date,
+      all_day: true,
+      // A sheet is an open ask to the whole scope, not an assignment to
+      // anyone: nobody is named until they claim a slot, and claims stay out
+      // of this payload.
+      member_ids: [],
+      source_label: "Volunteer",
+    }))
+    .sort((a, b) => String(a.start).localeCompare(String(b.start)))
+    .slice(0, CALENDAR_EXPORT_MAX_EVENTS);
+}

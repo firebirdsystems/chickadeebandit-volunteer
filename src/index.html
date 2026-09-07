@@ -133,7 +133,7 @@ import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, h
 import {
   canManage as _canManage, isSlotFull as _isSlotFull, claimCount as _claimCount,
   myClaim as _myClaim, sheetTotals as _sheetTotals, claimErrorMessage, searchableFields,
-  guestClaimsForSlot, isSlotGuestFull, unslottedGuestClaims,
+  guestClaimsForSlot, isSlotGuestFull, unslottedGuestClaims, buildCalendarEvents,
 } from "./logic.js";
 
 const CONTEXT     = window.__CONTEXT_URL   ?? "";
@@ -142,6 +142,7 @@ const CLAIM_URL   = window.__CLAIM_URL     ?? "";
 const RELEASE_URL = window.__RELEASE_URL   ?? "";
 const SWAP_URL    = window.__SWAP_URL      ?? "";
 const EVENTS_URL  = window.__EVENTS_URL    ?? "/api/events";
+const STORE_URL   = window.__STORE_URL     ?? "";
 const APP_ID      = window.__APP_ID        ?? "volunteer";
 const ME          = window.__CURRENT_MEMBER ?? null;
 
@@ -217,6 +218,24 @@ async function postJson(url, body) {
   }
   return json;
 }
+/**
+ * Republish the `calendar_events` export so dated sheets show up on the
+ * household calendar and in the ICS feed. Best-effort and never awaited into a
+ * caller's error path: a failed sync must not roll back a sheet the organizer
+ * just saved, and the next mutation republishes the whole payload anyway.
+ *
+ * The store ACL requires an adult, which is exactly who reaches the two call
+ * sites — creating and archiving a sheet are both behind `canManage()`.
+ */
+async function syncCalendar() {
+  if (!STORE_URL || !DB) return;
+  const events = buildCalendarEvents(sheets, today());
+  await fetch(STORE_URL, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key: "calendar_events", value: JSON.stringify(events) }),
+  }).catch(() => {});
+}
+
 function publish(type, subject_id, payload) {
   fetch(EVENTS_URL, {
     method: "POST", headers: { "Content-Type": "application/json" },
@@ -345,6 +364,7 @@ async function createSheet(form) {
     view = "sheets";
     showNotice("Sign-up sheet created.");
     publish("volunteer.sheet_created", sheet.id, { title: sheet.title });
+    syncCalendar();
     sendHubNotification({
       title: "New volunteer sheet",
       body: `${sheet.title} — sign up for a slot.`,
@@ -417,6 +437,7 @@ async function archiveSheet(sheetId) {
     sheets = sheets.filter(s => s.id !== sheetId);
     selectedSheetId = null;
     showNotice("Sheet archived.");
+    syncCalendar();
   } catch (e) { showError(e.message); }
 }
 
