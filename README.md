@@ -1,5 +1,7 @@
 # Volunteer Sign-Up
 
+A [Chickadee Bandit](https://chickadeebandit.com/app-library/volunteer) app.
+
 SignUpGenius-style slot sheets for Chickadee Bandit households, organizations, and
 HOAs. Adults create a sheet (a potluck, classroom-helper day, carpool coverage, or a
 shift backfill) with capacity-limited slots. Members **claim**, **swap**, and
