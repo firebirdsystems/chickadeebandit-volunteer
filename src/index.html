@@ -758,7 +758,7 @@ async function submitClaim(slotId) {
 
 // ── share links ───────────────────────────────────────────────────────────────
 let _shareLinks = [];       // last fetch, for copy-by-id lookups
-let _shareEntitled = false; // premium `sharing` capability
+let _shareEntitled = false; // `sharing` capability
 
 async function openShareModal(sheetId) {
   const sheet = sheets.find(s => s.id === sheetId);
@@ -782,10 +782,10 @@ async function openShareModal(sheetId) {
       <button class="btn btn-danger btn-sm" data-share-revoke="${esc(l.id)}" data-sheet-id="${esc(sheetId)}">Revoke</button>
     </div>`).join("");
 
-  // Premium (`sharing`) controls: a writable link, a password, a long expiry.
-  // A read-only link still shows the sheet and who has signed up; only the
-  // sign-up form itself is premium.
-  const premiumControls = _shareEntitled ? `
+  // `sharing` controls: a writable link, a password, a long expiry. A read-only
+  // link still shows the sheet and who has signed up; only the sign-up form
+  // itself needs the capability.
+  const sharingControls = _shareEntitled ? `
     <label class="share-opt">
       <input type="checkbox" id="share-writable" data-testid="share-writable" /> Let people sign up for a slot through the link
     </label>
@@ -798,7 +798,7 @@ async function openShareModal(sheetId) {
       Anyone with the link can see the sheet and who has signed up — no account needed. Links expire automatically.
     </p>
     ${rows || `<p class="muted tiny" style="padding:8px 0">No active links yet.</p>`}
-    ${premiumControls}
+    ${sharingControls}
     <div class="share-create">
       <select id="share-expiry">
         ${SHARE_EXPIRY_CHOICES.map(({ hours, label }) =>
