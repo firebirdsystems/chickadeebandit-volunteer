@@ -209,6 +209,7 @@
         },
         "event_date": {
           "type": "text",
+          "format": "date",
           "label": "Date (yyyy-mm-dd)",
           "required": true
         },
