@@ -302,6 +302,7 @@
       }
     }
   ],
+  "alert_on": ["volunteer.guest_signed_up"],
   "publishes": [
     "volunteer.sheet_created",
     "volunteer.slot_claimed"
