@@ -172,6 +172,7 @@
             "max_length": 200
           }
         ],
+        "until_column": "event_date",
         "max_submissions": 200,
         "event": "volunteer.guest_signed_up"
       }
