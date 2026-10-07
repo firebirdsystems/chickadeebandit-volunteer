@@ -129,7 +129,7 @@
 <div class="app"><div id="root" class="loading">Loading…</div></div>
 
 <script type="module">
-import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch, createShareHelper, hubToday as today, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS } from "/hub-sdk.js";
+import { esc, initial, memberColor, hubConfirm, hubAlert, sendHubNotification, hubAppUrl, searchMatch, createShareHelper, hubToday as today, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS, glyph } from "/hub-sdk.js";
 import {
   canManage as _canManage, isSlotFull as _isSlotFull, claimCount as _claimCount,
   myClaim as _myClaim, sheetTotals as _sheetTotals, claimErrorMessage, searchableFields,
@@ -676,7 +676,7 @@ function renderDetail() {
         </div>
         <div class="tools">
           <span class="pill ${t.filled ? "good" : "info"}">${t.claimed}/${t.capacity} filled</span>
-          ${share.enabled && canManage() ? `<button class="btn btn-ghost btn-sm" data-testid="sheet-share" data-share="${esc(sheet.id)}">🔗 Share</button>` : ""}
+          ${share.enabled && canManage() ? `<button class="btn btn-ghost btn-sm" data-testid="sheet-share" data-share="${esc(sheet.id)}">${glyph("link")} Share</button>` : ""}
           ${canManage() ? `<button class="btn btn-quiet-danger" data-testid="sheet-archive" data-archive="${esc(sheet.id)}">Archive</button>` : ""}
         </div>
       </div>
@@ -774,8 +774,8 @@ async function openShareModal(sheetId) {
         <input class="share-url" readonly value="${esc(l.url)}" onclick="this.select()" />
         <div class="muted tiny" style="margin-top:3px">
           Expires ${new Date(l.expiresAt).toLocaleDateString()} · ${l.viewCount} view${l.viewCount === 1 ? "" : "s"}${
-            l.writable ? ` · ${l.submissionCount} sign-up${l.submissionCount === 1 ? "" : "s"} · ✍️ collects sign-ups` : ""}${
-            l.hasPassword ? " · 🔒 password" : ""}
+            l.writable ? ` · ${l.submissionCount} sign-up${l.submissionCount === 1 ? "" : "s"} · ${glyph("pencil")} collects sign-ups` : ""}${
+            l.hasPassword ? ` · ${glyph("lock")} password` : ""}
         </div>
       </div>
       <button class="btn btn-ghost btn-sm" data-share-copy="${esc(l.id)}">Copy</button>
