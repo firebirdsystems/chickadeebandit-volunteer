@@ -1,0 +1,1521 @@
+{
+  "seed": [
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+0 minutes'), ?)",
+      "params": [
+        "perf-sheet-01",
+        "Fall Festival",
+        "Our biggest event of the year. Every pair of hands helps.",
+        "Chapter Hall",
+        "{{date:3}}",
+        "{{me}}",
+        "Perf Admin",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+1 minutes'))",
+      "params": [
+        "perf-slot-001",
+        "perf-sheet-01",
+        "Setup crew",
+        "Tables, tents and signage",
+        4,
+        3,
+        "08:00",
+        "open",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','+1 minutes'))",
+      "params": [
+        "perf-claim-001",
+        "perf-slot-001",
+        "{{me}}",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, created_at) VALUES (?, ?, ?, ?, datetime('now','-27 days','+1 minutes'))",
+      "params": [
+        "perf-guest-001",
+        "perf-sheet-01",
+        "perf-slot-001",
+        "Ken Ibarra"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+2 minutes'))",
+      "params": [
+        "perf-slot-002",
+        "perf-sheet-01",
+        "Ticket booth",
+        "Two-hour shifts",
+        2,
+        2,
+        "10:00",
+        "open",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','+2 minutes'))",
+      "params": [
+        "perf-claim-002",
+        "perf-slot-002",
+        "{{partner}}",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','+3 minutes'))",
+      "params": [
+        "perf-claim-003",
+        "perf-slot-002",
+        "{{child}}",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+3 minutes'))",
+      "params": [
+        "perf-slot-003",
+        "perf-sheet-01",
+        "Face painting",
+        "Paints provided",
+        2,
+        2,
+        "11:00",
+        "open",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','+4 minutes'))",
+      "params": [
+        "perf-claim-004",
+        "perf-slot-003",
+        "{{child}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','+5 minutes'))",
+      "params": [
+        "perf-claim-005",
+        "perf-slot-003",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, created_at) VALUES (?, ?, ?, ?, datetime('now','-27 days','+2 minutes'))",
+      "params": [
+        "perf-guest-002",
+        "perf-sheet-01",
+        "perf-slot-003",
+        "Priya Raman"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+4 minutes'))",
+      "params": [
+        "perf-slot-004",
+        "perf-sheet-01",
+        "Bake sale table",
+        3,
+        3,
+        "10:00",
+        "open",
+        3
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','+6 minutes'))",
+      "params": [
+        "perf-claim-006",
+        "perf-slot-004",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-30 days','+5 minutes'))",
+      "params": [
+        "perf-slot-005",
+        "perf-sheet-01",
+        "Cleanup",
+        "Many hands, quick work",
+        5,
+        0,
+        "16:00",
+        "open",
+        4
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-28 days','+7 minutes'))",
+      "params": [
+        "perf-claim-007",
+        "perf-slot-005",
+        "{{child2}}",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-27 days','+8 minutes'))",
+      "params": [
+        "perf-claim-008",
+        "perf-slot-005",
+        "{{me}}",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-22 days','+1 minutes'), ?)",
+      "params": [
+        "perf-sheet-02",
+        "School Book Fair",
+        "Help the library run the autumn book fair.",
+        "Elementary School Library",
+        "{{date:8}}",
+        "{{partner}}",
+        "Perf Partner",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-22 days','+2 minutes'))",
+      "params": [
+        "perf-slot-006",
+        "perf-sheet-02",
+        "Monday shift",
+        2,
+        2,
+        "09:00",
+        "open",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-20 days','+9 minutes'))",
+      "params": [
+        "perf-claim-009",
+        "perf-slot-006",
+        "{{partner}}",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-19 days','+10 minutes'))",
+      "params": [
+        "perf-claim-010",
+        "perf-slot-006",
+        "{{child}}",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-22 days','+3 minutes'))",
+      "params": [
+        "perf-slot-007",
+        "perf-sheet-02",
+        "Wednesday shift",
+        2,
+        2,
+        "09:00",
+        "open",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-20 days','+11 minutes'))",
+      "params": [
+        "perf-claim-011",
+        "perf-slot-007",
+        "{{child}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-19 days','+12 minutes'))",
+      "params": [
+        "perf-claim-012",
+        "perf-slot-007",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, created_at) VALUES (?, ?, ?, ?, datetime('now','-19 days','+3 minutes'))",
+      "params": [
+        "perf-guest-003",
+        "perf-sheet-02",
+        "perf-slot-007",
+        "Tom Lindqvist"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-18 days','+4 minutes'))",
+      "params": [
+        "perf-guest-004",
+        "perf-sheet-02",
+        "perf-slot-007",
+        "Sofia Marchetti",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-22 days','+4 minutes'))",
+      "params": [
+        "perf-slot-008",
+        "perf-sheet-02",
+        "Friday shift",
+        2,
+        1,
+        "09:00",
+        "open",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-20 days','+13 minutes'))",
+      "params": [
+        "perf-claim-013",
+        "perf-slot-008",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-22 days','+5 minutes'))",
+      "params": [
+        "perf-slot-009",
+        "perf-sheet-02",
+        "Pack-up",
+        3,
+        0,
+        "15:00",
+        "open",
+        3
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-20 days','+14 minutes'))",
+      "params": [
+        "perf-claim-014",
+        "perf-slot-009",
+        "{{child2}}",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-19 days','+15 minutes'))",
+      "params": [
+        "perf-claim-015",
+        "perf-slot-009",
+        "{{me}}",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-18 days','+2 minutes'), ?)",
+      "params": [
+        "perf-sheet-03",
+        "Neighbourhood Cleanup Day",
+        "Gloves and bags provided. Meet at the park gate.",
+        "Maple Street Park",
+        "{{date:15}}",
+        "{{me}}",
+        "Perf Admin",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-18 days','+3 minutes'))",
+      "params": [
+        "perf-slot-010",
+        "perf-sheet-03",
+        "Litter pick, north side",
+        5,
+        5,
+        "09:00",
+        "open",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','+16 minutes'))",
+      "params": [
+        "perf-claim-016",
+        "perf-slot-010",
+        "{{child}}",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-15 days','+17 minutes'))",
+      "params": [
+        "perf-claim-017",
+        "perf-slot-010",
+        "{{adult2}}",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days','+18 minutes'))",
+      "params": [
+        "perf-claim-018",
+        "perf-slot-010",
+        "{{child2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-15 days','+5 minutes'))",
+      "params": [
+        "perf-guest-005",
+        "perf-sheet-03",
+        "perf-slot-010",
+        "Dae-jung Park",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-18 days','+4 minutes'))",
+      "params": [
+        "perf-slot-011",
+        "perf-sheet-03",
+        "Litter pick, south side",
+        5,
+        5,
+        "09:00",
+        "open",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','+19 minutes'))",
+      "params": [
+        "perf-claim-019",
+        "perf-slot-011",
+        "{{adult2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-18 days','+5 minutes'))",
+      "params": [
+        "perf-slot-012",
+        "perf-sheet-03",
+        "Coffee and snacks table",
+        2,
+        2,
+        "08:30",
+        "open",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','+20 minutes'))",
+      "params": [
+        "perf-claim-020",
+        "perf-slot-012",
+        "{{child2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-15 days','+21 minutes'))",
+      "params": [
+        "perf-claim-021",
+        "perf-slot-012",
+        "{{me}}",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-15 days','+6 minutes'))",
+      "params": [
+        "perf-guest-006",
+        "perf-sheet-03",
+        "perf-slot-012",
+        "Hannah Weiss",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-18 days','+6 minutes'))",
+      "params": [
+        "perf-slot-013",
+        "perf-sheet-03",
+        "Haul to the transfer station",
+        "Needs a truck",
+        1,
+        1,
+        "12:00",
+        "open",
+        3
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-16 days','+22 minutes'))",
+      "params": [
+        "perf-claim-022",
+        "perf-slot-013",
+        "{{me}}",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days','+3 minutes'), ?)",
+      "params": [
+        "perf-sheet-04",
+        "Food Bank Sorting Night",
+        "Sorting and shelving donations.",
+        "Community Food Bank",
+        "{{date:21}}",
+        "{{adult2}}",
+        "Perf Neighbour",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days','+4 minutes'))",
+      "params": [
+        "perf-slot-014",
+        "perf-sheet-04",
+        "Sorting",
+        "Closed-toe shoes required",
+        5,
+        4,
+        "18:00",
+        "open",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+23 minutes'))",
+      "params": [
+        "perf-claim-023",
+        "perf-slot-014",
+        "{{adult2}}",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days','+5 minutes'))",
+      "params": [
+        "perf-slot-015",
+        "perf-sheet-04",
+        "Shelving",
+        3,
+        2,
+        "18:00",
+        "open",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+24 minutes'))",
+      "params": [
+        "perf-claim-024",
+        "perf-slot-015",
+        "{{child2}}",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-11 days','+25 minutes'))",
+      "params": [
+        "perf-claim-025",
+        "perf-slot-015",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-11 days','+7 minutes'))",
+      "params": [
+        "perf-guest-007",
+        "perf-sheet-04",
+        "perf-slot-015",
+        "Luis Ortega",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, created_at) VALUES (?, ?, ?, ?, datetime('now','-10 days','+8 minutes'))",
+      "params": [
+        "perf-guest-008",
+        "perf-sheet-04",
+        "perf-slot-015",
+        "Amara Nwosu"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-14 days','+6 minutes'))",
+      "params": [
+        "perf-slot-016",
+        "perf-sheet-04",
+        "Front desk",
+        1,
+        0,
+        "17:30",
+        "closed",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+26 minutes'))",
+      "params": [
+        "perf-claim-026",
+        "perf-slot-016",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+4 minutes'), ?)",
+      "params": [
+        "perf-sheet-05",
+        "Halloween Trunk-or-Treat",
+        "Decorate a trunk or help with traffic.",
+        "Church Car Park",
+        "{{date:22}}",
+        "{{partner}}",
+        "Perf Partner",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+5 minutes'))",
+      "params": [
+        "perf-slot-017",
+        "perf-sheet-05",
+        "Decorated trunks",
+        5,
+        5,
+        "17:00",
+        "open",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+27 minutes'))",
+      "params": [
+        "perf-claim-027",
+        "perf-slot-017",
+        "{{child2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+28 minutes'))",
+      "params": [
+        "perf-claim-028",
+        "perf-slot-017",
+        "{{me}}",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, created_at) VALUES (?, ?, ?, ?, datetime('now','-9 days','+9 minutes'))",
+      "params": [
+        "perf-guest-009",
+        "perf-sheet-05",
+        "perf-slot-017",
+        "Colin Byrne"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+6 minutes'))",
+      "params": [
+        "perf-slot-018",
+        "perf-sheet-05",
+        "Traffic and parking",
+        3,
+        2,
+        "16:30",
+        "open",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+29 minutes'))",
+      "params": [
+        "perf-claim-029",
+        "perf-slot-018",
+        "{{me}}",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+30 minutes'))",
+      "params": [
+        "perf-claim-030",
+        "perf-slot-018",
+        "{{partner}}",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-8 days','+31 minutes'))",
+      "params": [
+        "perf-claim-031",
+        "perf-slot-018",
+        "{{child}}",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+7 minutes'))",
+      "params": [
+        "perf-slot-019",
+        "perf-sheet-05",
+        "Candy restock",
+        2,
+        2,
+        "17:00",
+        "open",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+32 minutes'))",
+      "params": [
+        "perf-claim-032",
+        "perf-slot-019",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, created_at) VALUES (?, ?, ?, ?, datetime('now','-9 days','+10 minutes'))",
+      "params": [
+        "perf-guest-010",
+        "perf-sheet-05",
+        "perf-slot-019",
+        "Yuki Tanaka"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-12 days','+8 minutes'))",
+      "params": [
+        "perf-slot-020",
+        "perf-sheet-05",
+        "Photo corner",
+        1,
+        1,
+        "17:00",
+        "open",
+        3
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-10 days','+33 minutes'))",
+      "params": [
+        "perf-claim-033",
+        "perf-slot-020",
+        "{{child}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+5 minutes'), ?)",
+      "params": [
+        "perf-sheet-06",
+        "Soccer Season Snack Schedule",
+        "One family per game.",
+        "Riverside Fields",
+        "{{date:29}}",
+        "{{me}}",
+        "Perf Admin",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+6 minutes'))",
+      "params": [
+        "perf-slot-021",
+        "perf-sheet-06",
+        "Game 1 snacks",
+        1,
+        0,
+        "09:00",
+        "open",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','+34 minutes'))",
+      "params": [
+        "perf-claim-034",
+        "perf-slot-021",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+7 minutes'))",
+      "params": [
+        "perf-slot-022",
+        "perf-sheet-06",
+        "Game 2 snacks",
+        1,
+        0,
+        "09:00",
+        "open",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','+35 minutes'))",
+      "params": [
+        "perf-claim-035",
+        "perf-slot-022",
+        "{{partner}}",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+8 minutes'))",
+      "params": [
+        "perf-slot-023",
+        "perf-sheet-06",
+        "Game 3 snacks",
+        1,
+        0,
+        "09:00",
+        "open",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','+36 minutes'))",
+      "params": [
+        "perf-claim-036",
+        "perf-slot-023",
+        "{{child}}",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+9 minutes'))",
+      "params": [
+        "perf-slot-024",
+        "perf-sheet-06",
+        "Game 4 snacks",
+        1,
+        0,
+        "09:00",
+        "open",
+        3
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','+37 minutes'))",
+      "params": [
+        "perf-claim-037",
+        "perf-slot-024",
+        "{{adult2}}",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-40 days','+10 minutes'))",
+      "params": [
+        "perf-slot-025",
+        "perf-sheet-06",
+        "End of season party",
+        3,
+        2,
+        "12:00",
+        "open",
+        4
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-38 days','+38 minutes'))",
+      "params": [
+        "perf-claim-038",
+        "perf-slot-025",
+        "{{child2}}",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+6 minutes'), ?)",
+      "params": [
+        "perf-sheet-07",
+        "Thanksgiving Meal Drive",
+        "Cooking and delivering meals to neighbours.",
+        "Community Kitchen",
+        "{{date:45}}",
+        "{{partner}}",
+        "Perf Partner",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+7 minutes'))",
+      "params": [
+        "perf-slot-026",
+        "perf-sheet-07",
+        "Cooking crew",
+        "Morning shift",
+        4,
+        3,
+        "08:00",
+        "open",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-7 days','+39 minutes'))",
+      "params": [
+        "perf-claim-039",
+        "perf-slot-026",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','+40 minutes'))",
+      "params": [
+        "perf-claim-040",
+        "perf-slot-026",
+        "{{child}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-6 days','+11 minutes'))",
+      "params": [
+        "perf-guest-011",
+        "perf-sheet-07",
+        "perf-slot-026",
+        "Renee Dubois",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+8 minutes'))",
+      "params": [
+        "perf-slot-027",
+        "perf-sheet-07",
+        "Packing",
+        4,
+        3,
+        "11:00",
+        "open",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-7 days','+41 minutes'))",
+      "params": [
+        "perf-claim-041",
+        "perf-slot-027",
+        "{{child}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','+42 minutes'))",
+      "params": [
+        "perf-claim-042",
+        "perf-slot-027",
+        "{{adult2}}",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','+43 minutes'))",
+      "params": [
+        "perf-claim-043",
+        "perf-slot-027",
+        "{{child2}}",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-9 days','+9 minutes'))",
+      "params": [
+        "perf-slot-028",
+        "perf-sheet-07",
+        "Delivery drivers",
+        "Bring your own car",
+        5,
+        5,
+        "12:30",
+        "open",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-6 days','+12 minutes'))",
+      "params": [
+        "perf-guest-012",
+        "perf-sheet-07",
+        "perf-slot-028",
+        "Marta Okafor",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','+7 minutes'), ?)",
+      "params": [
+        "perf-sheet-08",
+        "Winter Coat Drive",
+        "Collecting and sorting coats.",
+        "Library Meeting Room",
+        "{{date:60}}",
+        "{{adult2}}",
+        "Perf Neighbour",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','+8 minutes'))",
+      "params": [
+        "perf-slot-029",
+        "perf-sheet-08",
+        "Collection table",
+        2,
+        2,
+        "10:00",
+        "open",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days','+44 minutes'))",
+      "params": [
+        "perf-claim-044",
+        "perf-slot-029",
+        "{{child}}",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 days','+45 minutes'))",
+      "params": [
+        "perf-claim-045",
+        "perf-slot-029",
+        "{{adult2}}",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','+9 minutes'))",
+      "params": [
+        "perf-slot-030",
+        "perf-sheet-08",
+        "Sorting by size",
+        3,
+        3,
+        "13:00",
+        "open",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-3 days','+13 minutes'))",
+      "params": [
+        "perf-guest-013",
+        "perf-sheet-08",
+        "perf-slot-030",
+        "Ken Ibarra",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-2 days','+14 minutes'))",
+      "params": [
+        "perf-guest-014",
+        "perf-sheet-08",
+        "perf-slot-030",
+        "Priya Raman",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 days','+10 minutes'))",
+      "params": [
+        "perf-slot-031",
+        "perf-sheet-08",
+        "Drop-off run",
+        1,
+        1,
+        "16:00",
+        "open",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days','+46 minutes'))",
+      "params": [
+        "perf-claim-046",
+        "perf-slot-031",
+        "{{child2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days','+8 minutes'), ?)",
+      "params": [
+        "perf-sheet-09",
+        "Holiday Concert Ushers",
+        "Programs, seating and the cookie table.",
+        "School Auditorium",
+        "{{date:70}}",
+        "{{me}}",
+        "Perf Admin",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days','+9 minutes'))",
+      "params": [
+        "perf-slot-032",
+        "perf-sheet-09",
+        "Ushers",
+        4,
+        2,
+        "18:00",
+        "open",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, created_at) VALUES (?, ?, ?, ?, datetime('now','-1 days','+15 minutes'))",
+      "params": [
+        "perf-guest-015",
+        "perf-sheet-09",
+        "perf-slot-032",
+        "Tom Lindqvist"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days','+10 minutes'))",
+      "params": [
+        "perf-slot-033",
+        "perf-sheet-09",
+        "Cookie table",
+        2,
+        2,
+        "18:00",
+        "open",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+47 minutes'))",
+      "params": [
+        "perf-claim-047",
+        "perf-slot-033",
+        "{{child2}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4 days','+11 minutes'))",
+      "params": [
+        "perf-slot-034",
+        "perf-sheet-09",
+        "Stage crew",
+        3,
+        0,
+        "17:00",
+        "open",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+48 minutes'))",
+      "params": [
+        "perf-claim-048",
+        "perf-slot-034",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+49 minutes'))",
+      "params": [
+        "perf-claim-049",
+        "perf-slot-034",
+        "{{partner}}",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+9 minutes'), ?)",
+      "params": [
+        "perf-sheet-10",
+        "Spring Garden Build",
+        "Raised beds for the school garden.",
+        "School Garden",
+        "{{date:160}}",
+        "{{partner}}",
+        "Perf Partner",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+10 minutes'))",
+      "params": [
+        "perf-slot-035",
+        "perf-sheet-10",
+        "Lumber and soil pickup",
+        2,
+        1,
+        "08:00",
+        "open",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-3 minutes'))",
+      "params": [
+        "perf-claim-050",
+        "perf-slot-035",
+        "{{child2}}",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+11 minutes'))",
+      "params": [
+        "perf-slot-036",
+        "perf-sheet-10",
+        "Building beds",
+        5,
+        5,
+        "09:00",
+        "open",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-3 minutes'))",
+      "params": [
+        "perf-claim-051",
+        "perf-slot-036",
+        "{{me}}",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-3 minutes'))",
+      "params": [
+        "perf-claim-052",
+        "perf-slot-036",
+        "{{partner}}",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, created_at) VALUES (?, ?, ?, ?, datetime('now','+0 days','-3 minutes'))",
+      "params": [
+        "perf-guest-016",
+        "perf-sheet-10",
+        "perf-slot-036",
+        "Sofia Marchetti"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, created_at) VALUES (?, ?, ?, ?, datetime('now','+0 days','-3 minutes'))",
+      "params": [
+        "perf-guest-017",
+        "perf-sheet-10",
+        "perf-slot-036",
+        "Dae-jung Park"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+12 minutes'))",
+      "params": [
+        "perf-slot-037",
+        "perf-sheet-10",
+        "Lunch for the crew",
+        2,
+        2,
+        "12:00",
+        "open",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-3 minutes'))",
+      "params": [
+        "perf-claim-053",
+        "perf-slot-037",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','+0 days','-3 minutes'))",
+      "params": [
+        "perf-claim-054",
+        "perf-slot-037",
+        "{{child}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+10 minutes'), ?)",
+      "params": [
+        "perf-sheet-11",
+        "Back-to-School Picnic",
+        "Thanks to everyone who came.",
+        "Maple Street Park",
+        "{{date:-25}}",
+        "{{me}}",
+        "Perf Admin",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+11 minutes'))",
+      "params": [
+        "perf-slot-038",
+        "perf-sheet-11",
+        "Grill",
+        2,
+        1,
+        "11:00",
+        "closed",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-58 days','+55 minutes'))",
+      "params": [
+        "perf-claim-055",
+        "perf-slot-038",
+        "{{me}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-57 days','+56 minutes'))",
+      "params": [
+        "perf-claim-056",
+        "perf-slot-038",
+        "{{partner}}",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-57 days','+18 minutes'))",
+      "params": [
+        "perf-guest-018",
+        "perf-sheet-11",
+        "perf-slot-038",
+        "Hannah Weiss",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+12 minutes'))",
+      "params": [
+        "perf-slot-039",
+        "perf-sheet-11",
+        "Games",
+        3,
+        2,
+        "12:00",
+        "closed",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-58 days','+57 minutes'))",
+      "params": [
+        "perf-claim-057",
+        "perf-slot-039",
+        "{{partner}}",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-57 days','+58 minutes'))",
+      "params": [
+        "perf-claim-058",
+        "perf-slot-039",
+        "{{child}}",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-56 days','+59 minutes'))",
+      "params": [
+        "perf-claim-059",
+        "perf-slot-039",
+        "{{adult2}}",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-60 days','+13 minutes'))",
+      "params": [
+        "perf-slot-040",
+        "perf-sheet-11",
+        "Cleanup",
+        4,
+        0,
+        "14:00",
+        "closed",
+        2
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-58 days','+60 minutes'))",
+      "params": [
+        "perf-claim-060",
+        "perf-slot-040",
+        "{{child}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-85 days','+11 minutes'), ?)",
+      "params": [
+        "perf-sheet-12",
+        "Summer Reading Finale",
+        "Wrap-up party for the reading challenge.",
+        "Public Library",
+        "{{date:-50}}",
+        "{{partner}}",
+        "Perf Partner",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-85 days','+12 minutes'))",
+      "params": [
+        "perf-slot-041",
+        "perf-sheet-12",
+        "Prize table",
+        2,
+        2,
+        "10:00",
+        "closed",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-83 days','+61 minutes'))",
+      "params": [
+        "perf-claim-061",
+        "perf-slot-041",
+        "{{partner}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, created_at) VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-82 days','+62 minutes'))",
+      "params": [
+        "perf-claim-062",
+        "perf-slot-041",
+        "{{child}}"
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-85 days','+13 minutes'))",
+      "params": [
+        "perf-slot-042",
+        "perf-sheet-12",
+        "Snacks",
+        2,
+        2,
+        "10:00",
+        "closed",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-83 days','+63 minutes'))",
+      "params": [
+        "perf-claim-063",
+        "perf-slot-042",
+        "{{child}}",
+        "Can bring a folding table."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-82 days','+19 minutes'))",
+      "params": [
+        "perf-guest-019",
+        "perf-sheet-12",
+        "perf-slot-042",
+        "Luis Ortega",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-81 days','+20 minutes'))",
+      "params": [
+        "perf-guest-020",
+        "perf-sheet-12",
+        "perf-slot-042",
+        "Amara Nwosu",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+12 minutes'), ?)",
+      "params": [
+        "perf-sheet-13",
+        "Fourth of July Parade",
+        "Float building and candy toss.",
+        "Main Street",
+        "{{date:-97}}",
+        "{{me}}",
+        "Perf Admin",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+13 minutes'))",
+      "params": [
+        "perf-slot-043",
+        "perf-sheet-13",
+        "Float building",
+        5,
+        3,
+        "08:00",
+        "closed",
+        0
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-128 days','+64 minutes'))",
+      "params": [
+        "perf-claim-064",
+        "perf-slot-043",
+        "{{child}}",
+        "Might be ten minutes late."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__guest_claims (id, sheet_id, slot_id, guest_name, note, created_at) VALUES (?, ?, ?, ?, ?, datetime('now','-127 days','+21 minutes'))",
+      "params": [
+        "perf-guest-021",
+        "perf-sheet-13",
+        "perf-slot-043",
+        "Colin Byrne",
+        "Bringing my teenager to help."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+14 minutes'))",
+      "params": [
+        "perf-slot-044",
+        "perf-sheet-13",
+        "Candy toss walkers",
+        4,
+        4,
+        "10:00",
+        "closed",
+        1
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-128 days','+65 minutes'))",
+      "params": [
+        "perf-claim-065",
+        "perf-slot-044",
+        "{{adult2}}",
+        "Happy to stay for cleanup too."
+      ]
+    },
+    {
+      "sql": "INSERT INTO app_volunteer__slot_claims (id, slot_id, member_id, note, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-127 days','+66 minutes'))",
+      "params": [
+        "perf-claim-066",
+        "perf-slot-044",
+        "{{child2}}",
+        "Bringing my teenager to help."
+      ]
+    }
+  ]
+}
