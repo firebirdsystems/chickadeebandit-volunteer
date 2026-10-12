@@ -122,6 +122,8 @@
       background: var(--surface, var(--card, #fff)); color: var(--text, inherit);
     }
     .search-input:focus { outline: none; border-color: var(--accent, #6366f1); }
+    .load-error { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; background: var(--hub-tint-danger, #fee2e2); color: var(--hub-tint-danger-fg, #b91c1c); font-size: 0.9rem; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    .load-error-retry { background: none; border: 1px solid currentColor; border-radius: 8px; padding: 5px 10px; font: inherit; font-weight: 600; color: inherit; cursor: pointer; flex-shrink: 0; }
   </style>
   <base href="/run/volunteer/">
 </head>
@@ -203,8 +205,8 @@ async function dbq(sql, params = []) {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ sql, params }),
   });
-  const json = await res.json();
-  if (json.error) throw new Error(json.error);
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
   return json;
 }
 async function postJson(url, body) {
@@ -212,9 +214,9 @@ async function postJson(url, body) {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok || json.error) {
-    throw Object.assign(new Error(json.error || "Request failed"), { reason: json.reason, status: res.status });
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json || typeof json !== "object" || json.error) {
+    throw Object.assign(new Error(json?.error || "Request failed"), { reason: json.reason, status: res.status });
   }
   return json;
 }
@@ -253,10 +255,11 @@ async function loadMembers() {
       { id: "demo-4", name: "Riley", role: "child" },
     ];
   } else {
-    try {
-      const res = await fetch(`${CONTEXT}?keys=family.members`);
-      members = ((await res.json())["family.members"]) ?? [];
-    } catch { members = []; }
+    // A failed read is a failed load, never an empty household.
+    const res = await fetch(`${CONTEXT}?keys=family.members`);
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data || typeof data !== "object" || (Array.isArray(data.$errors) && data.$errors.includes("family.members"))) throw new Error("Couldn’t load members");
+    members = data["family.members"] ?? [];
   }
   memberMap = new Map(members.map(m => [m.id, m]));
   currentMember = ME ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
@@ -301,14 +304,21 @@ async function loadData() {
   guestClaims = guestRows.rows;
 }
 
+// loadFailed is set when the first load fails and cleared when a load
+// succeeds. A later refresh that fails keeps what is on screen.
+let loaded = false, loadFailed = false;
 async function refresh() {
   clearMessages();
   try {
     await Promise.all([loadMembers(), loadData()]);
+    loaded = true; loadFailed = false;
     if (selectedSheetId && !sheets.some(s => s.id === selectedSheetId)) selectedSheetId = null;
     handleDeepLink();
     render();
-  } catch (e) { error = e.message; render(); }
+  } catch (e) {
+    if (loaded) error = e.message; else loadFailed = true;
+    render();
+  }
 }
 function handleDeepLink() {
   const sheetId = new URLSearchParams(window.location.search).get("sheetId");
@@ -763,7 +773,9 @@ let _shareEntitled = false; // `sharing` capability
 async function openShareModal(sheetId) {
   const sheet = sheets.find(s => s.id === sheetId);
   if (!sheet) return;
-  const status = await share.listAll();
+  let status;
+  try { status = await share.listAll(); }
+  catch (err) { hubAlert("Couldn't load share links", { description: err.message }); return; }
   _shareLinks = status.links;
   _shareEntitled = status.entitled;
   const active = activeShareLinks(_shareLinks, sheetId);
@@ -845,7 +857,12 @@ async function revokeShareLink(id, sheetId) {
 function render() {
   const root = document.getElementById("root");
   root.className = "app";
-  if (selectedSheetId) root.innerHTML = renderDetail();
+  if (loadFailed) root.innerHTML = `
+    <div class="topbar">
+      <div><h1>Volunteer Sign-Up</h1><p class="muted tiny">Claim a slot without overbooking.</p></div>
+    </div>
+    <div class="load-error" data-testid="load-error" role="alert"><span>Couldn’t load the sign-up sheets.</span> <button type="button" class="load-error-retry" data-testid="load-retry">Try again</button></div>`;
+  else if (selectedSheetId) root.innerHTML = renderDetail();
   else if (view === "create") root.innerHTML = renderCreate();
   else if (view === "mine") root.innerHTML = renderMine();
   else root.innerHTML = renderList();
@@ -855,6 +872,7 @@ function render() {
 document.addEventListener("click", (event) => {
   const t = event.target.closest("button, [data-open-sheet]");
   if (!t) return;
+  if (t.dataset.testid === "load-retry") { refresh(); return; }
   const open = t.getAttribute("data-open-sheet");
   if (open) { selectedSheetId = open; clearMessages(); render(); return; }
   if (t.matches("[data-back], [data-view-sheets]")) { selectedSheetId = null; view = "sheets"; clearMessages(); render(); return; }
