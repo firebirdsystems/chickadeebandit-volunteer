@@ -209,6 +209,10 @@ async function dbq(sql, params = []) {
   if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
   return json;
 }
+// A failed write shows one fixed line for the action. Only wording this app
+// wrote for the reader (marked `forUser` where it is thrown) is shown as is;
+// the hub's own error text goes to the console.
+function failText(e, line) { if (!e?.forUser) console.error(e); return e?.forUser ? e.message : line; }
 async function postJson(url, body) {
   const res = await fetch(url, {
     method: "POST", headers: { "Content-Type": "application/json" },
@@ -316,7 +320,7 @@ async function refresh() {
     handleDeepLink();
     render();
   } catch (e) {
-    if (loaded) error = e.message; else loadFailed = true;
+    if (loaded) error = failText(e, "Couldn’t refresh the sign-up sheets."); else loadFailed = true;
     render();
   }
 }
@@ -382,7 +386,7 @@ async function createSheet(form) {
     }).catch(() => {});
   } catch (e) {
     if (btn) { btn.disabled = false; btn.textContent = "Create sheet"; }
-    showError(e.message);
+    showError(failText(e, "Couldn’t create the sheet — try again."));
   }
 }
 
@@ -401,7 +405,7 @@ async function claimSlot(slotId, note = "") {
     return true;
   } catch (e) {
     if (e.reason) { await loadData().catch(() => {}); showError(claimErrorMessage(e.reason)); }
-    else showError(e.message);
+    else showError(failText(e, "Couldn’t sign up — try again."));
     return false;
   }
 }
@@ -414,7 +418,7 @@ async function releaseClaim(slotId) {
     claims = claims.filter(c => c.id !== mine.id);
     showNotice("Released your slot.");
     return true;
-  } catch (e) { showError(e.message); return false; }
+  } catch (e) { showError(failText(e, "Couldn’t release your slot — try again.")); return false; }
 }
 
 async function swapSlot(toSlotId) {
@@ -434,7 +438,7 @@ async function swapSlot(toSlotId) {
     }
   } catch (e) {
     if (e.reason) { await loadData().catch(() => {}); showError(claimErrorMessage(e.reason)); }
-    else showError(e.message);
+    else showError(failText(e, "Couldn’t move your sign-up — try again."));
   }
 }
 
@@ -448,7 +452,7 @@ async function archiveSheet(sheetId) {
     selectedSheetId = null;
     showNotice("Sheet archived.");
     syncCalendar();
-  } catch (e) { showError(e.message); }
+  } catch (e) { showError(failText(e, "Couldn’t archive the sheet — try again.")); }
 }
 
 async function toggleSlotStatus(slotId) {
@@ -461,7 +465,7 @@ async function toggleSlotStatus(slotId) {
     const i = slots.findIndex(s => s.id === slotId);
     if (i !== -1) slots[i] = { ...slots[i], status: next };
     render();
-  } catch (e) { showError(e.message); }
+  } catch (e) { showError(failText(e, "Couldn’t update the slot — try again.")); }
 }
 
 // The guest allowance the hub enforces on the public form. Nothing else in the
@@ -481,7 +485,7 @@ async function setGuestCapacity(slotId, raw) {
     if (i !== -1) slots[i] = { ...slots[i], guest_capacity: next };
     render();
   } catch (e) {
-    showError(e.message);
+    showError(failText(e, "Couldn’t update the guest allowance — try again."));
     render();
   }
 }
@@ -775,7 +779,7 @@ async function openShareModal(sheetId) {
   if (!sheet) return;
   let status;
   try { status = await share.listAll(); }
-  catch (err) { hubAlert("Couldn't load share links", { description: err.message }); return; }
+  catch (err) { console.error(err); hubAlert("Couldn’t load the share links."); return; }
   _shareLinks = status.links;
   _shareEntitled = status.entitled;
   const active = activeShareLinks(_shareLinks, sheetId);
