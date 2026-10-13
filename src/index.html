@@ -136,6 +136,7 @@ import {
   canManage as _canManage, isSlotFull as _isSlotFull, claimCount as _claimCount,
   myClaim as _myClaim, sheetTotals as _sheetTotals, claimErrorMessage, searchableFields,
   guestClaimsForSlot, isSlotGuestFull, unslottedGuestClaims, buildCalendarEvents,
+  sheetCreateStatements, SHEET_CREATE_MAX_SLOTS,
 } from "./logic.js";
 
 const CONTEXT     = window.__CONTEXT_URL   ?? "";
@@ -199,11 +200,12 @@ function slotClaims(slotId) {
 }
 function selectedSheet() { return sheets.find(s => s.id === selectedSheetId) ?? null; }
 
+// An array of `{ sql, params }` in place of `sql` goes as one atomic batch.
 async function dbq(sql, params = []) {
   if (!DB) return { rows: [] };
   const res = await fetch(DB, {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ sql, params }),
+    body: JSON.stringify(Array.isArray(sql) ? { statements: sql } : { sql, params }),
   });
   const json = await res.json().catch(() => null);
   if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error(json?.error || "Couldn’t reach the hub. Try again.");
@@ -344,6 +346,7 @@ async function createSheet(form) {
     .map((s, i) => ({ title: s.title.trim(), capacity: Math.max(1, Number(s.capacity) || 1), starts_at: s.starts_at || "", sort_order: i }))
     .filter(s => s.title);
   if (!title || cleanSlots.length === 0) return showError("Add a title and at least one slot.");
+  if (cleanSlots.length > SHEET_CREATE_MAX_SLOTS) return showError(`A sheet can start with up to ${SHEET_CREATE_MAX_SLOTS} slots.`);
 
   const btn = form.querySelector('button[type="submit"]');
   if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
@@ -357,20 +360,9 @@ async function createSheet(form) {
   // on the slot card. It stays inert until someone mints a WRITABLE link.
   const newSlots = cleanSlots.map(s => ({ ...s, id: uid("slot"), sheet_id: sheet.id, details: "", status: "open", guest_capacity: s.capacity, created_at: nowIso() }));
   try {
-    if (DB) {
-      await dbq(
-        `INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`,
-        [sheet.id, sheet.title, sheet.description, sheet.location, sheet.event_date, sheet.created_by, sheet.created_by_name, sheet.created_at]
-      );
-      for (const s of newSlots) {
-        await dbq(
-          `INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, 'open', ?, ?)`,
-          [s.id, s.sheet_id, s.title, s.details, s.capacity, s.guest_capacity, s.starts_at, s.sort_order, s.created_at]
-        );
-      }
-    }
+    // One batch: the sheet and every slot land together or not at all, so a
+    // failed create leaves no slotless sheet for a retry to duplicate.
+    if (DB) await dbq(sheetCreateStatements(sheet, newSlots));
     sheets = [...sheets, sheet].sort((a, b) => (a.event_date || "").localeCompare(b.event_date || ""));
     slots = [...slots, ...newSlots];
     draftSlots = [{ title: "", capacity: 1, starts_at: "" }];

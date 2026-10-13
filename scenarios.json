@@ -323,6 +323,109 @@
           }
         }
       ]
+    },
+    {
+      "name": "a new sheet and its slots are created by one batch, as the page sends it",
+      "members": {
+        "host": "adult"
+      },
+      "steps": [
+        {
+          "action": "batch",
+          "as": "host",
+          "statements": [
+            {
+              "sql": "INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)",
+              "params": [
+                "sh-new",
+                "Fall Festival",
+                "",
+                "Chapter Hall",
+                "2026-09-12",
+                "{{host}}",
+                "Host",
+                "2026-09-01T00:00:00Z"
+              ]
+            },
+            {
+              "sql": "INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'open', ?, ?), (?, ?, ?, ?, ?, ?, ?, 'open', ?, ?)",
+              "params": [
+                "sl-new-1",
+                "sh-new",
+                "Setup crew",
+                "",
+                3,
+                3,
+                "",
+                0,
+                "2026-09-01T00:00:00Z",
+                "sl-new-2",
+                "sh-new",
+                "Cleanup",
+                "",
+                2,
+                2,
+                "",
+                1,
+                "2026-09-01T00:00:00Z"
+              ]
+            }
+          ],
+          "expect": {
+            "status": 200,
+            "changed": [
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, title, location FROM app_volunteer__sheets WHERE id = ?",
+          "params": [
+            "sh-new"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 1,
+            "rowsContain": [
+              {
+                "title": "Fall Festival",
+                "location": "Chapter Hall"
+              }
+            ]
+          }
+        },
+        {
+          "action": "db",
+          "as": "host",
+          "sql": "SELECT id, title, capacity, guest_capacity, status FROM app_volunteer__slots WHERE sheet_id = ? ORDER BY sort_order ASC",
+          "params": [
+            "sh-new"
+          ],
+          "expect": {
+            "status": 200,
+            "rowCount": 2,
+            "rowsContain": [
+              {
+                "id": "sl-new-1",
+                "title": "Setup crew",
+                "capacity": 3,
+                "guest_capacity": 3,
+                "status": "open"
+              },
+              {
+                "id": "sl-new-2",
+                "title": "Cleanup",
+                "capacity": 2,
+                "guest_capacity": 2,
+                "status": "open"
+              }
+            ]
+          }
+        }
+      ]
     }
   ]
 }

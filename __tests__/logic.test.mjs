@@ -3,6 +3,7 @@ import {
   canManage, claimCount, isSlotFull, myClaim, sheetTotals, claimErrorMessage, searchableFields,
   guestClaimsForSlot, guestClaimCount, isSlotGuestFull, unslottedGuestClaims,
   buildCalendarEvents, CALENDAR_EXPORT_MAX_EVENTS,
+  sheetCreateStatements, SHEET_CREATE_MAX_SLOTS,
 } from "../src/logic.js";
 
 const adult = { id: "a1", role: "adult" };
@@ -190,5 +191,45 @@ describe("buildCalendarEvents", () => {
     expect(out[0].id).toBe("sh000");
     // The trimmed tail is the FAR end: the last kept entry is day 49, not 69.
     expect(out.at(-1).start).toBe(day(Math.floor((CALENDAR_EXPORT_MAX_EVENTS - 1) / 2)));
+  });
+});
+
+describe("sheetCreateStatements: a sheet and its slots are one atomic batch", () => {
+  const newSheet = {
+    id: "sheet-1", title: "Fall Festival", description: "d", location: "Hall", event_date: "2026-09-12",
+    created_by: "a1", created_by_name: "Alex", created_at: "2026-09-01T00:00:00Z",
+  };
+  const slot = (i) => ({
+    id: `slot-${i}`, sheet_id: "sheet-1", title: `Task ${i}`, details: "", capacity: 2, guest_capacity: 2,
+    starts_at: "", sort_order: i, created_at: "2026-09-01T00:00:00Z",
+  });
+  const many = (n) => Array.from({ length: n }, (_, i) => slot(i));
+  const placeholders = (sql) => (sql.match(/\?/g) ?? []).length;
+
+  it("puts the sheet first and every slot after it, in one list", () => {
+    const out = sheetCreateStatements(newSheet, many(3));
+    expect(out).toHaveLength(2);
+    expect(out[0].sql).toMatch(/^INSERT INTO app_volunteer__sheets /);
+    expect(out[0].params).toEqual(["sheet-1", "Fall Festival", "d", "Hall", "2026-09-12", "a1", "Alex", "2026-09-01T00:00:00Z"]);
+    expect(out[1].sql).toMatch(/^INSERT INTO app_volunteer__slots /);
+    expect(out[1].params.slice(0, 9)).toEqual(["slot-0", "sheet-1", "Task 0", "", 2, 2, "", 0, "2026-09-01T00:00:00Z"]);
+    expect(out[1].params).toHaveLength(27);
+  });
+
+  it("binds exactly as many values as each statement has placeholders, never more than 100", () => {
+    const out = sheetCreateStatements(newSheet, many(30));
+    expect(out).toHaveLength(4); // sheet + 11 + 11 + 8
+    for (const st of out) {
+      expect(st.params).toHaveLength(placeholders(st.sql));
+      expect(st.params.length).toBeLessThanOrEqual(100);
+      expect(st).not.toHaveProperty("requireChanges"); // only UPDATE/DELETE may carry it
+    }
+    expect(out.slice(1).flatMap((st) => st.params.filter((p) => /^slot-\d+$/.test(String(p))))).toEqual(many(30).map((s) => s.id));
+  });
+
+  it("fits the hub's 25-statement batch at the cap and refuses one slot more", () => {
+    expect(SHEET_CREATE_MAX_SLOTS).toBe(264);
+    expect(sheetCreateStatements(newSheet, many(SHEET_CREATE_MAX_SLOTS))).toHaveLength(25);
+    expect(sheetCreateStatements(newSheet, many(SHEET_CREATE_MAX_SLOTS + 1))).toBeNull();
   });
 });

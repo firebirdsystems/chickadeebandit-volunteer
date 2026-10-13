@@ -75,6 +75,33 @@ export function claimErrorMessage(reason) {
   }
 }
 
+// ── Creating a sheet ──────────────────────────────────────────────────────────
+// The sheet and its slots go to the hub as ONE batch, so a failure part-way
+// leaves nothing behind and a retry cannot make a second sheet. The hub takes
+// 25 statements a batch and 100 bound values a statement: a slot row binds 9,
+// so 11 rows share an INSERT and 24 such INSERTs follow the sheet's.
+const SLOT_ROWS_PER_INSERT = 11;
+export const SHEET_CREATE_MAX_SLOTS = 24 * SLOT_ROWS_PER_INSERT;
+
+/** The statements that create `sheet` with `newSlots`, or null when they cannot fit one batch. */
+export function sheetCreateStatements(sheet, newSlots) {
+  if (newSlots.length > SHEET_CREATE_MAX_SLOTS) return null;
+  const statements = [{
+    sql: `INSERT INTO app_volunteer__sheets (id, title, description, location, event_date, created_by, created_by_name, created_at, archived)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`,
+    params: [sheet.id, sheet.title, sheet.description, sheet.location, sheet.event_date, sheet.created_by, sheet.created_by_name, sheet.created_at],
+  }];
+  for (let i = 0; i < newSlots.length; i += SLOT_ROWS_PER_INSERT) {
+    const rows = newSlots.slice(i, i + SLOT_ROWS_PER_INSERT);
+    statements.push({
+      sql: `INSERT INTO app_volunteer__slots (id, sheet_id, title, details, capacity, guest_capacity, starts_at, status, sort_order, created_at)
+           VALUES ${rows.map(() => "(?, ?, ?, ?, ?, ?, ?, 'open', ?, ?)").join(", ")}`,
+      params: rows.flatMap((s) => [s.id, s.sheet_id, s.title, s.details, s.capacity, s.guest_capacity, s.starts_at, s.sort_order, s.created_at]),
+    });
+  }
+  return statements;
+}
+
 /**
  * Fields the in-app search matches against (see hub-sdk `searchMatch`).
  * Location and description count as well as the title — a sign-up
