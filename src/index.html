@@ -220,7 +220,7 @@ async function postJson(url, body) {
   });
   const json = await res.json().catch(() => null);
   if (!res.ok || !json || typeof json !== "object" || json.error) {
-    throw Object.assign(new Error(json?.error || "Request failed"), { reason: json.reason, status: res.status });
+    throw Object.assign(new Error(json?.error || "Request failed"), { reason: json?.reason, status: res.status });
   }
   return json;
 }
