@@ -1,7 +1,7 @@
 -- Sign-up sheets — an event or effort that needs volunteers (potluck, classroom
 -- helpers, carpool coverage, shift backfills). Everyone reads; only adults create.
 CREATE TABLE IF NOT EXISTS app_volunteer__sheets (
-  id              TEXT PRIMARY KEY,
+  id              TEXT NOT NULL PRIMARY KEY,
   title           TEXT NOT NULL,
   description     TEXT NOT NULL DEFAULT '',
   location        TEXT NOT NULL DEFAULT '',
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS app_volunteer__sheets (
 
 -- Individual slots on a sheet — a task with a capacity, claimable up to capacity.
 CREATE TABLE IF NOT EXISTS app_volunteer__slots (
-  id          TEXT PRIMARY KEY,
+  id          TEXT NOT NULL PRIMARY KEY,
   sheet_id    TEXT NOT NULL,
   title       TEXT NOT NULL,
   details     TEXT NOT NULL DEFAULT '',
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS app_volunteer__slots (
 -- (claim / release / swap), which atomically enforce capacity. Direct app SQL
 -- against this table is rejected by the endpoint_only row policy.
 CREATE TABLE IF NOT EXISTS app_volunteer__slot_claims (
-  id         TEXT PRIMARY KEY,
+  id         TEXT NOT NULL PRIMARY KEY,
   slot_id    TEXT NOT NULL,
   member_id  TEXT NOT NULL,
   note       TEXT NOT NULL DEFAULT '',
